@@ -8,8 +8,10 @@ package io.camunda.connector.textract.model;
 
 import io.camunda.connector.generator.dsl.Property.FeelMode;
 import io.camunda.connector.generator.java.annotation.TemplateProperty;
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.apache.commons.lang3.StringUtils;
 
 public record TextractRequestData(
     @TemplateProperty(
@@ -148,4 +150,45 @@ public record TextractRequestData(
                 @TemplateProperty.PropertyCondition(
                     property = "input.executionType",
                     equals = "ASYNC"))
-        String outputConfigS3Prefix) {}
+        String outputConfigS3Prefix) {
+  public static final String WRONG_OUTPUT_VALUES_MSG =
+      "Output S3 bucket must be filled in if output S3 prefix is filled in";
+
+  public static final String WRONG_NOTIFICATION_VALUES_MSG =
+      "either both notification values role ARN and topic ARN must be filled in or none of them";
+
+  @AssertTrue
+  public boolean hasValidNotificationProperties() {
+    if (executionType != TextractExecutionType.ASYNC) {
+      return true;
+    }
+
+    if (StringUtils.isAllEmpty(notificationChannelRoleArn, notificationChannelSnsTopicArn)) {
+      return true;
+    }
+
+    if (StringUtils.isNoneEmpty(notificationChannelRoleArn, notificationChannelSnsTopicArn)) {
+      return true;
+    } else {
+      throw new IllegalArgumentException(WRONG_NOTIFICATION_VALUES_MSG);
+    }
+  }
+
+  @AssertTrue
+  public boolean hasValidOutputConfigProperties() {
+    if (executionType != TextractExecutionType.ASYNC) {
+      return true;
+    }
+    if (StringUtils.isAllEmpty(outputConfigS3Bucket, outputConfigS3Prefix)) {
+      return true;
+    }
+
+    if (StringUtils.isNoneEmpty(outputConfigS3Bucket, outputConfigS3Prefix)) {
+      return true;
+    }
+    if (StringUtils.isEmpty(outputConfigS3Bucket)) {
+      throw new IllegalArgumentException(WRONG_OUTPUT_VALUES_MSG);
+    }
+    return true;
+  }
+}
