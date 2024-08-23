@@ -21,11 +21,10 @@ public class AsyncTextractCaller implements TextractCaller<StartDocumentAnalysis
     final StartDocumentAnalysisRequest startDocumentAnalysisRequest =
         new StartDocumentAnalysisRequest()
             .withFeatureTypes(prepareFeatureTypes(requestData))
-            .withDocumentLocation(prepareDocumentLocation(requestData));
-
-    startDocumentAnalysisRequest.withClientRequestToken(requestData.clientRequestToken());
-    startDocumentAnalysisRequest.withJobTag(requestData.jobTag());
-    startDocumentAnalysisRequest.withKMSKeyId(requestData.kmsKeyId());
+            .withDocumentLocation(prepareDocumentLocation(requestData))
+            .withClientRequestToken(requestData.clientRequestToken())
+            .withJobTag(requestData.jobTag())
+            .withKMSKeyId(requestData.kmsKeyId());
 
     prepareNotification(startDocumentAnalysisRequest, requestData);
     prepareOutput(startDocumentAnalysisRequest, requestData);
@@ -33,22 +32,13 @@ public class AsyncTextractCaller implements TextractCaller<StartDocumentAnalysis
     return textractClient.startDocumentAnalysis(startDocumentAnalysisRequest);
   }
 
-  /*
-  case 1:
-  when NotificationChannel value is null
-  the result of textractClient.startDocumentAnalysis(startDocumentAnalysisRequest) is SUCCESSFUL
-  case 2:
-  when NotificationChannel value is not equal to null but its fields are not set
-  the result of textractClient.startDocumentAnalysis(startDocumentAnalysisRequest) is FAIL
-   */
   private void prepareNotification(
       StartDocumentAnalysisRequest startDocumentAnalysisRequest, TextractRequestData requestData) {
     String roleArn = requestData.notificationChannelRoleArn();
     String snsTopic = requestData.notificationChannelSnsTopicArn();
-    if (StringUtils.isNoneEmpty(roleArn, snsTopic)) {
+    if (StringUtils.isNoneBlank(roleArn, snsTopic)) {
       NotificationChannel notificationChannel =
           new NotificationChannel().withSNSTopicArn(snsTopic).withRoleArn(roleArn);
-
       startDocumentAnalysisRequest.withNotificationChannel(notificationChannel);
     }
   }
@@ -57,9 +47,10 @@ public class AsyncTextractCaller implements TextractCaller<StartDocumentAnalysis
       StartDocumentAnalysisRequest startDocumentAnalysisRequest, TextractRequestData requestData) {
     String s3Bucket = requestData.outputConfigS3Bucket();
     String s3Prefix = requestData.outputConfigS3Prefix();
-    if (StringUtils.isNoneEmpty(s3Bucket)) {
-      OutputConfig outputConfig = new OutputConfig().withS3Bucket(s3Bucket).withS3Prefix(s3Prefix);
-
+    if (StringUtils.isNoneBlank(s3Bucket)) {
+      OutputConfig outputConfig = new OutputConfig()
+              .withS3Bucket(s3Bucket)
+              .withS3Prefix(s3Prefix);
       startDocumentAnalysisRequest.withOutputConfig(outputConfig);
     }
   }

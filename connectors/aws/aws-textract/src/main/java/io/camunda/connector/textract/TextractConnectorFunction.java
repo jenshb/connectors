@@ -6,10 +6,6 @@
  */
 package io.camunda.connector.textract;
 
-import static io.camunda.connector.textract.suppliers.util.AmazonTextractClientUtil.getAsyncTextractClient;
-import static io.camunda.connector.textract.suppliers.util.AmazonTextractClientUtil.getSyncTextractClient;
-
-import com.amazonaws.services.textract.model.Block;
 import io.camunda.connector.api.annotation.OutboundConnector;
 import io.camunda.connector.api.outbound.OutboundConnectorContext;
 import io.camunda.connector.api.outbound.OutboundConnectorFunction;
@@ -18,12 +14,7 @@ import io.camunda.connector.textract.caller.AsyncTextractCaller;
 import io.camunda.connector.textract.caller.PollingTextractCalller;
 import io.camunda.connector.textract.caller.SyncTextractCaller;
 import io.camunda.connector.textract.model.TextractRequest;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.camunda.connector.textract.suppliers.AmazonTextractClientSupplier;
 
 @OutboundConnector(
     name = "AWS Textract",
@@ -46,7 +37,7 @@ import org.slf4j.LoggerFactory;
     icon = "icon.svg")
 public class TextractConnectorFunction implements OutboundConnectorFunction {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(TextractConnectorFunction.class);
+  private final AmazonTextractClientSupplier clientSupplier;
 
   private final SyncTextractCaller syncTextractCaller;
 
@@ -55,15 +46,18 @@ public class TextractConnectorFunction implements OutboundConnectorFunction {
   private final AsyncTextractCaller asyncTextractCaller;
 
   public TextractConnectorFunction() {
+    this.clientSupplier = new AmazonTextractClientSupplier();
     this.syncTextractCaller = new SyncTextractCaller();
     this.pollingTextractCaller = new PollingTextractCalller();
     this.asyncTextractCaller = new AsyncTextractCaller();
   }
 
   public TextractConnectorFunction(
+          AmazonTextractClientSupplier clientSupplier,
       SyncTextractCaller syncTextractCaller,
       PollingTextractCalller pollingTextractCaller,
       AsyncTextractCaller asyncTextractCaller) {
+    this.clientSupplier = clientSupplier;
     this.syncTextractCaller = syncTextractCaller;
     this.pollingTextractCaller = pollingTextractCaller;
     this.asyncTextractCaller = asyncTextractCaller;
@@ -71,38 +65,11 @@ public class TextractConnectorFunction implements OutboundConnectorFunction {
 
   @Override
   public Object execute(OutboundConnectorContext context) throws Exception {
-    TextractRequest request;
-    try {
-      request = context.bindVariables(TextractRequest.class);
-    } catch (Exception ex) {
-      LOGGER.warn("Invalid data provided: {}", ex.getCause().getCause().getMessage());
-      throw new IllegalArgumentException(ex.getCause().getCause().getMessage());
-    }
-
+    TextractRequest request = context.bindVariables(TextractRequest.class);
     return switch (request.getInput().executionType()) {
-      case SYNC -> executeSync(request);
-      case POLLING -> executePolling(request);
-      case ASYNC -> executeAsync(request);
+      case SYNC -> asyncTextractCaller.call(request.getInput(), clientSupplier.getAsyncTextractClient(request));
+      case POLLING -> pollingTextractCaller.call(request.getInput(), clientSupplier.getAsyncTextractClient(request));
+      case ASYNC -> syncTextractCaller.call(request.getInput(), clientSupplier.getSyncTextractClient(request));
     };
-  }
-
-  private String executeAsync(final TextractRequest request) {
-    return asyncTextractCaller.call(request.getInput(), getAsyncTextractClient(request)).getJobId();
-  }
-
-  private Set<String> executePolling(final TextractRequest request) throws Exception {
-    final var analysisResult =
-        pollingTextractCaller.call(request.getInput(), getAsyncTextractClient(request));
-    return fetchText(analysisResult.getBlocks());
-  }
-
-  private Set<String> executeSync(final TextractRequest request) {
-    final var docResult =
-        syncTextractCaller.call(request.getInput(), getSyncTextractClient(request));
-    return fetchText(docResult.getBlocks());
-  }
-
-  private Set<String> fetchText(final List<Block> blocks) {
-    return blocks.stream().map(Block::getText).filter(Objects::nonNull).collect(Collectors.toSet());
   }
 }

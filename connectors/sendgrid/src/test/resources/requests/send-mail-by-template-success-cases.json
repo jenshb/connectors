@@ -2,7 +2,6 @@
   {
     "apiKey": "{{secrets.SENDGRID_API_KEY}}",
     "from": {
-      "name": "John Doe",
       "email": "john.doe@example.com"
     },
     "to": {

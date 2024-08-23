@@ -18,8 +18,7 @@ public class SyncTextractCaller implements TextractCaller<AnalyzeDocumentResult>
   @Override
   public AnalyzeDocumentResult call(
       TextractRequestData requestData, AmazonTextract textractClient) {
-    final S3Object s3Obj = this.prepareS3Obj(requestData);
-    final Document document = new Document().withS3Object(s3Obj);
+    final Document document = new Document().withS3Object(prepareS3Obj(requestData));
 
     final AnalyzeDocumentRequest analyzeDocumentRequest =
         new AnalyzeDocumentRequest()

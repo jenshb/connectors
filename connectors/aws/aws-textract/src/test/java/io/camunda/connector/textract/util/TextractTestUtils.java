@@ -17,14 +17,6 @@ public class TextractTestUtils {
       """
                 {
                    "input": {
-                      "body": {
-                         "inputs": {
-                            "value": "The answer to life, the universe, and everything is",
-                            "params": {
-                               "temperature": 0.3
-                            }
-                         }
-                      },
                       "accept": "application/json",
 
                       "executionType": "ASYNC",
@@ -40,7 +32,7 @@ public class TextractTestUtils {
                       "kmsKeyId": "keyId",
                       "notificationChannelRoleArn": "roleArn",
                       "notificationChannelSnsTopicArn": "topicArn",
-                      "outputConfigS3Bucket": "outputBucket",
+                      "outputConfigS3Bucket": "",
                       "outputConfigS3Prefix": "outputPrefix"
                    },
                    "configuration": {

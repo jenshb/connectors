@@ -23,13 +23,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PollingTextractCalller implements TextractCaller<GetDocumentAnalysisResult> {
-  public static final int DELAY_BETWEEN_POLLING = 5;
+  public static final long DELAY_BETWEEN_POLLING = 5;
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PollingTextractCalller.class);
 
   @Override
   public GetDocumentAnalysisResult call(
       TextractRequestData requestData, AmazonTextract textractClient) throws Exception {
+    LOGGER.debug("Starting polling task for analize document"); //todo
     final StartDocumentAnalysisRequest startDocReq =
         new StartDocumentAnalysisRequest()
             .withFeatureTypes(this.prepareFeatureTypes(requestData))
@@ -53,19 +54,6 @@ public class PollingTextractCalller implements TextractCaller<GetDocumentAnalysi
   }
 
   private boolean continuePolling(String status, TextractRequestData requestData) {
-    if ("IN_PROGRESS".equals(status)) {
-      return true;
-    }
-
-    if ("PARTIAL_SUCCESS".equals(status)) {
-      LOGGER.warn(
-          "For the document: {} with version: {} in bucket: {} got PARTIAL_SUCCESS status",
-          requestData.documentName(),
-          requestData.documentVersion(),
-          requestData.documentS3Bucket());
-      return false;
-    }
-
-    return false;
+    return "IN_PROGRESS".equals(status);
   }
 }

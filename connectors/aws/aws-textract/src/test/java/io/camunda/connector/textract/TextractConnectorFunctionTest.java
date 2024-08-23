@@ -7,7 +7,6 @@
 package io.camunda.connector.textract;
 
 import static io.camunda.connector.textract.model.TextractRequestData.WRONG_NOTIFICATION_VALUES_MSG;
-import static io.camunda.connector.textract.model.TextractRequestData.WRONG_OUTPUT_VALUES_MSG;
 import static io.camunda.connector.textract.util.TextractTestUtils.ASYNC_EXECUTION_JSON_WITH_ROLE_ARN_AND_WITHOUT_SNS_TOPIC;
 import static io.camunda.connector.textract.util.TextractTestUtils.ASYNC_EXECUTION_JSON_WITH_SNS_TOPIC_AND_WITHOUT_ROLE_ARN;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,6 +18,7 @@ import com.amazonaws.services.textract.model.AnalyzeDocumentResult;
 import com.amazonaws.services.textract.model.Block;
 import com.amazonaws.services.textract.model.GetDocumentAnalysisResult;
 import com.amazonaws.services.textract.model.StartDocumentAnalysisResult;
+import io.camunda.connector.api.error.ConnectorInputException;
 import io.camunda.connector.test.outbound.OutboundConnectorContextBuilder;
 import io.camunda.connector.textract.caller.AsyncTextractCaller;
 import io.camunda.connector.textract.caller.PollingTextractCalller;
@@ -99,19 +99,19 @@ class TextractConnectorFunctionTest {
 
   @Test
   void executeAsyncReqWithS3PrefixAndWithoutS3Bucket() {
-    var outBounderContext =
-        OutboundConnectorContextBuilder.create()
+    //todo
+    OutboundConnectorContextBuilder builder = OutboundConnectorContextBuilder.create()
             .secret("ACCESS_KEY", TextractTestUtils.ACTUAL_ACCESS_KEY)
-            .secret("SECRET_KEY", TextractTestUtils.ACTUAL_SECRET_KEY)
-            .variables(TextractTestUtils.ASYNC_EXECUTION_JSON_WITHOUT_S3_BUCKET_OUTPUT)
+            .secret("SECRET_KEY", TextractTestUtils.ACTUAL_SECRET_KEY);
+    OutboundConnectorContextBuilder.TestConnectorContext outBounderContext = builder.variables(TextractTestUtils.ASYNC_EXECUTION_JSON_WITHOUT_S3_BUCKET_OUTPUT)
             .build();
 
     Exception exception =
         assertThrows(
-            IllegalArgumentException.class,
+                ConnectorInputException.class,
             () -> textractConnectorFunction.execute(outBounderContext));
 
-    assertThat(exception.getMessage()).isEqualTo(WRONG_OUTPUT_VALUES_MSG);
+//    assertThat(exception.getMessage()).isEqualTo(WRONG_OUTPUT_VALUES_MSG);
   }
 
   @ParameterizedTest

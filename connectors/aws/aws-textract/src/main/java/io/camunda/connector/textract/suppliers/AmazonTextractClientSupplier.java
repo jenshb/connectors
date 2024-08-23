@@ -4,7 +4,7 @@
  *       See the License.txt file for more information. You may not use this file
  *       except in compliance with the proprietary license.
  */
-package io.camunda.connector.textract.suppliers.util;
+package io.camunda.connector.textract.suppliers;
 
 import com.amazonaws.services.textract.AmazonTextract;
 import com.amazonaws.services.textract.AmazonTextractAsync;
@@ -13,20 +13,16 @@ import com.amazonaws.services.textract.AmazonTextractClientBuilder;
 import io.camunda.connector.aws.CredentialsProviderSupport;
 import io.camunda.connector.textract.model.TextractRequest;
 
-public class AmazonTextractClientUtil {
+public class AmazonTextractClientSupplier {
 
-  private AmazonTextractClientUtil() {
-    throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
-  }
-
-  public static AmazonTextract getSyncTextractClient(final TextractRequest request) {
+  public AmazonTextract getSyncTextractClient(final TextractRequest request) {
     return AmazonTextractClientBuilder.standard()
         .withCredentials(CredentialsProviderSupport.credentialsProvider(request))
         .withRegion(request.getConfiguration().region())
         .build();
   }
 
-  public static AmazonTextractAsync getAsyncTextractClient(final TextractRequest request) {
+  public AmazonTextractAsync getAsyncTextractClient(final TextractRequest request) {
     return AmazonTextractAsyncClientBuilder.standard()
         .withCredentials(CredentialsProviderSupport.credentialsProvider(request))
         .withRegion(request.getConfiguration().region())

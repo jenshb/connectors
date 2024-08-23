@@ -157,38 +157,31 @@ public record TextractRequestData(
   public static final String WRONG_NOTIFICATION_VALUES_MSG =
       "either both notification values role ARN and topic ARN must be filled in or none of them";
 
-  @AssertTrue
+  @AssertTrue(message = "Invalid data provided")
   public boolean hasValidNotificationProperties() {
-    if (executionType != TextractExecutionType.ASYNC) {
-      return true;
+    if (executionType != TextractExecutionType.ASYNC ) {
+        return true;
     }
-
-    if (StringUtils.isAllEmpty(notificationChannelRoleArn, notificationChannelSnsTopicArn)) {
-      return true;
-    }
-
-    if (StringUtils.isNoneEmpty(notificationChannelRoleArn, notificationChannelSnsTopicArn)) {
-      return true;
+    if (StringUtils.isNoneBlank(notificationChannelRoleArn, notificationChannelSnsTopicArn) || StringUtils.isAllBlank(notificationChannelRoleArn, notificationChannelSnsTopicArn)) {
+        return true;
     } else {
-      throw new IllegalArgumentException(WRONG_NOTIFICATION_VALUES_MSG);
+        return false;
     }
   }
 
-  @AssertTrue
+  @AssertTrue(message = "blalblabal")
   public boolean hasValidOutputConfigProperties() {
     if (executionType != TextractExecutionType.ASYNC) {
       return true;
     }
-    if (StringUtils.isAllEmpty(outputConfigS3Bucket, outputConfigS3Prefix)) {
+
+    if (StringUtils.isAllBlank(outputConfigS3Bucket, outputConfigS3Prefix)) {
       return true;
     }
 
-    if (StringUtils.isNoneEmpty(outputConfigS3Bucket, outputConfigS3Prefix)) {
+    if (StringUtils.isNoneBlank(outputConfigS3Bucket, outputConfigS3Prefix)) {
       return true;
     }
-    if (StringUtils.isEmpty(outputConfigS3Bucket)) {
-      throw new IllegalArgumentException(WRONG_OUTPUT_VALUES_MSG);
-    }
-    return true;
+      return !StringUtils.isBlank(outputConfigS3Bucket);
   }
 }

@@ -14,15 +14,18 @@ import com.amazonaws.services.textract.AmazonTextractAsyncClient;
 import com.amazonaws.services.textract.AmazonTextractClient;
 import io.camunda.connector.aws.model.impl.AwsBaseConfiguration;
 import io.camunda.connector.textract.model.TextractRequest;
+import io.camunda.connector.textract.suppliers.AmazonTextractClientSupplier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class AmazonTextractClientUtilTest {
+class AmazonTextractClientSupplierTest {
 
   private TextractRequest request;
+  private AmazonTextractClientSupplier clientSupplier;
 
   @BeforeEach
   public void setUp() {
+    clientSupplier = new AmazonTextractClientSupplier();
     AwsBaseConfiguration configuration = new AwsBaseConfiguration("region", "");
 
     request = new TextractRequest();
@@ -32,13 +35,13 @@ class AmazonTextractClientUtilTest {
   @Test
   void getSyncTextractClient() {
     AmazonTextractClient client =
-        (AmazonTextractClient) AmazonTextractClientUtil.getSyncTextractClient(request);
+        (AmazonTextractClient) clientSupplier.getSyncTextractClient(request);
     assertThat(client).isInstanceOf(AmazonTextractClient.class);
   }
 
   @Test
   void getAsyncTextractClient() {
-    AmazonTextractAsync client = AmazonTextractClientUtil.getAsyncTextractClient(request);
+    AmazonTextractAsync client = clientSupplier.getAsyncTextractClient(request);
     assertNotNull(client);
     assertThat(client).isInstanceOf(AmazonTextractAsyncClient.class);
   }
