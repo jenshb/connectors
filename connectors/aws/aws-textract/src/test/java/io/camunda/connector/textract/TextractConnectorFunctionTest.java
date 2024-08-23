@@ -99,19 +99,20 @@ class TextractConnectorFunctionTest {
 
   @Test
   void executeAsyncReqWithS3PrefixAndWithoutS3Bucket() {
-    //todo
-    OutboundConnectorContextBuilder builder = OutboundConnectorContextBuilder.create()
+    // todo
+    OutboundConnectorContextBuilder builder =
+        OutboundConnectorContextBuilder.create()
             .secret("ACCESS_KEY", TextractTestUtils.ACTUAL_ACCESS_KEY)
             .secret("SECRET_KEY", TextractTestUtils.ACTUAL_SECRET_KEY);
-    OutboundConnectorContextBuilder.TestConnectorContext outBounderContext = builder.variables(TextractTestUtils.ASYNC_EXECUTION_JSON_WITHOUT_S3_BUCKET_OUTPUT)
-            .build();
+    OutboundConnectorContextBuilder.TestConnectorContext outBounderContext =
+        builder.variables(TextractTestUtils.ASYNC_EXECUTION_JSON_WITHOUT_S3_BUCKET_OUTPUT).build();
 
     Exception exception =
         assertThrows(
-                ConnectorInputException.class,
+            ConnectorInputException.class,
             () -> textractConnectorFunction.execute(outBounderContext));
 
-//    assertThat(exception.getMessage()).isEqualTo(WRONG_OUTPUT_VALUES_MSG);
+    //    assertThat(exception.getMessage()).isEqualTo(WRONG_OUTPUT_VALUES_MSG);
   }
 
   @ParameterizedTest

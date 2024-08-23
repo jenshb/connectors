@@ -48,9 +48,7 @@ public class AsyncTextractCaller implements TextractCaller<StartDocumentAnalysis
     String s3Bucket = requestData.outputConfigS3Bucket();
     String s3Prefix = requestData.outputConfigS3Prefix();
     if (StringUtils.isNoneBlank(s3Bucket)) {
-      OutputConfig outputConfig = new OutputConfig()
-              .withS3Bucket(s3Bucket)
-              .withS3Prefix(s3Prefix);
+      OutputConfig outputConfig = new OutputConfig().withS3Bucket(s3Bucket).withS3Prefix(s3Prefix);
       startDocumentAnalysisRequest.withOutputConfig(outputConfig);
     }
   }

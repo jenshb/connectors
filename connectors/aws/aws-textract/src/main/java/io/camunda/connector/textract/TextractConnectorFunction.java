@@ -53,7 +53,7 @@ public class TextractConnectorFunction implements OutboundConnectorFunction {
   }
 
   public TextractConnectorFunction(
-          AmazonTextractClientSupplier clientSupplier,
+      AmazonTextractClientSupplier clientSupplier,
       SyncTextractCaller syncTextractCaller,
       PollingTextractCalller pollingTextractCaller,
       AsyncTextractCaller asyncTextractCaller) {
@@ -67,9 +67,15 @@ public class TextractConnectorFunction implements OutboundConnectorFunction {
   public Object execute(OutboundConnectorContext context) throws Exception {
     TextractRequest request = context.bindVariables(TextractRequest.class);
     return switch (request.getInput().executionType()) {
-      case SYNC -> asyncTextractCaller.call(request.getInput(), clientSupplier.getAsyncTextractClient(request));
-      case POLLING -> pollingTextractCaller.call(request.getInput(), clientSupplier.getAsyncTextractClient(request));
-      case ASYNC -> syncTextractCaller.call(request.getInput(), clientSupplier.getSyncTextractClient(request));
+      case SYNC ->
+          asyncTextractCaller.call(
+              request.getInput(), clientSupplier.getAsyncTextractClient(request));
+      case POLLING ->
+          pollingTextractCaller.call(
+              request.getInput(), clientSupplier.getAsyncTextractClient(request));
+      case ASYNC ->
+          syncTextractCaller.call(
+              request.getInput(), clientSupplier.getSyncTextractClient(request));
     };
   }
 }

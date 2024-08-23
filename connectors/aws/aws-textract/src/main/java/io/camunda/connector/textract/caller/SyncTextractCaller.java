@@ -10,7 +10,6 @@ import com.amazonaws.services.textract.AmazonTextract;
 import com.amazonaws.services.textract.model.AnalyzeDocumentRequest;
 import com.amazonaws.services.textract.model.AnalyzeDocumentResult;
 import com.amazonaws.services.textract.model.Document;
-import com.amazonaws.services.textract.model.S3Object;
 import io.camunda.connector.textract.model.TextractRequestData;
 
 public class SyncTextractCaller implements TextractCaller<AnalyzeDocumentResult> {

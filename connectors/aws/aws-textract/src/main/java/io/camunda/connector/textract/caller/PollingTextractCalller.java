@@ -30,7 +30,7 @@ public class PollingTextractCalller implements TextractCaller<GetDocumentAnalysi
   @Override
   public GetDocumentAnalysisResult call(
       TextractRequestData requestData, AmazonTextract textractClient) throws Exception {
-    LOGGER.debug("Starting polling task for analize document"); //todo
+    LOGGER.debug("Starting polling task for analize document"); // todo
     final StartDocumentAnalysisRequest startDocReq =
         new StartDocumentAnalysisRequest()
             .withFeatureTypes(this.prepareFeatureTypes(requestData))

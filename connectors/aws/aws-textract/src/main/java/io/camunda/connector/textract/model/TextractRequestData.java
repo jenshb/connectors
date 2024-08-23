@@ -159,13 +159,14 @@ public record TextractRequestData(
 
   @AssertTrue(message = "Invalid data provided")
   public boolean hasValidNotificationProperties() {
-    if (executionType != TextractExecutionType.ASYNC ) {
-        return true;
+    if (executionType != TextractExecutionType.ASYNC) {
+      return true;
     }
-    if (StringUtils.isNoneBlank(notificationChannelRoleArn, notificationChannelSnsTopicArn) || StringUtils.isAllBlank(notificationChannelRoleArn, notificationChannelSnsTopicArn)) {
-        return true;
+    if (StringUtils.isNoneBlank(notificationChannelRoleArn, notificationChannelSnsTopicArn)
+        || StringUtils.isAllBlank(notificationChannelRoleArn, notificationChannelSnsTopicArn)) {
+      return true;
     } else {
-        return false;
+      return false;
     }
   }
 
@@ -182,6 +183,6 @@ public record TextractRequestData(
     if (StringUtils.isNoneBlank(outputConfigS3Bucket, outputConfigS3Prefix)) {
       return true;
     }
-      return !StringUtils.isBlank(outputConfigS3Bucket);
+    return !StringUtils.isBlank(outputConfigS3Bucket);
   }
 }
