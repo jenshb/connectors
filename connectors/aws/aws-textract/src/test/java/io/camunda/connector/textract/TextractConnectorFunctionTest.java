@@ -11,22 +11,31 @@ import static io.camunda.connector.textract.util.TextractTestUtils.ASYNC_EXECUTI
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.amazonaws.services.textract.AmazonTextract;
+import com.amazonaws.services.textract.AmazonTextractAsync;
 import com.amazonaws.services.textract.model.AnalyzeDocumentResult;
 import com.amazonaws.services.textract.model.GetDocumentAnalysisResult;
 import com.amazonaws.services.textract.model.StartDocumentAnalysisResult;
 import io.camunda.connector.api.error.ConnectorInputException;
+import io.camunda.connector.aws.model.impl.AwsAuthentication;
 import io.camunda.connector.test.outbound.OutboundConnectorContextBuilder;
 import io.camunda.connector.textract.caller.AsyncTextractCaller;
 import io.camunda.connector.textract.caller.PollingTextractCalller;
 import io.camunda.connector.textract.caller.SyncTextractCaller;
+import io.camunda.connector.textract.model.TextractRequest;
+import io.camunda.connector.textract.model.TextractRequestData;
 import io.camunda.connector.textract.suppliers.AmazonTextractClientSupplier;
 import io.camunda.connector.textract.util.TextractTestUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -39,6 +48,10 @@ class TextractConnectorFunctionTest {
   @Mock private AsyncTextractCaller asyncCaller;
 
   @Mock private AmazonTextractClientSupplier clientSupplier;
+  @Mock private AmazonTextract amazonTextractClient;
+  @Mock private AmazonTextractAsync amazonTextractAsyncClient;
+
+  @Captor private ArgumentCaptor<TextractRequest> textractRequestCaptor;
 
   @InjectMocks private TextractConnectorFunction textractConnectorFunction;
 
@@ -46,22 +59,33 @@ class TextractConnectorFunctionTest {
   void executeSyncReq() throws Exception {
     var outBounderContext = prepareConnectorContext(TextractTestUtils.SYNC_EXECUTION_JSON);
 
-    when(clientSupplier.getSyncTextractClient(any())).thenCallRealMethod();
-    when(syncCaller.call(any(), any())).thenReturn(new AnalyzeDocumentResult());
+    when(clientSupplier.getSyncTextractClient(textractRequestCaptor.capture())).thenReturn(amazonTextractClient);
+    when(amazonTextractClient.analyzeDocument(any())).thenReturn(new AnalyzeDocumentResult());
+    when(syncCaller.call(any(TextractRequestData.class), eq(amazonTextractClient))).thenCallRealMethod();
 
     var result = textractConnectorFunction.execute(outBounderContext);
+
     assertThat(result).isInstanceOf(AnalyzeDocumentResult.class);
+    var authentication = (AwsAuthentication.AwsStaticCredentialsAuthentication) textractRequestCaptor.getValue().getAuthentication();
+
+    assertThat(authentication.accessKey()).isEqualTo(TextractTestUtils.ACTUAL_ACCESS_KEY);
+    assertThat(authentication.secretKey()).isEqualTo(TextractTestUtils.ACTUAL_SECRET_KEY);
   }
 
   @Test
   void executeAsyncReq() throws Exception {
     var outBounderContext = prepareConnectorContext(TextractTestUtils.ASYNC_EXECUTION_JSON);
 
-    when(clientSupplier.getAsyncTextractClient(any())).thenCallRealMethod();
-    when(asyncCaller.call(any(), any())).thenReturn(new StartDocumentAnalysisResult());
+    when(clientSupplier.getAsyncTextractClient(textractRequestCaptor.capture())).thenReturn(amazonTextractAsyncClient);
+    when(amazonTextractAsyncClient.startDocumentAnalysis(any())).thenReturn(new StartDocumentAnalysisResult());
+    when(asyncCaller.call(any(TextractRequestData.class), eq(amazonTextractAsyncClient))).thenCallRealMethod();
 
     var result = textractConnectorFunction.execute(outBounderContext);
     assertThat(result).isInstanceOf(StartDocumentAnalysisResult.class);
+
+    var authentication = (AwsAuthentication.AwsStaticCredentialsAuthentication) textractRequestCaptor.getValue().getAuthentication();
+    assertThat(authentication.accessKey()).isEqualTo(TextractTestUtils.ACTUAL_ACCESS_KEY);
+    assertThat(authentication.secretKey()).isEqualTo(TextractTestUtils.ACTUAL_SECRET_KEY);
   }
 
   @Test
@@ -80,12 +104,7 @@ class TextractConnectorFunctionTest {
     var outBounderContext =
         prepareConnectorContext(TextractTestUtils.ASYNC_EXECUTION_JSON_WITHOUT_S3_BUCKET_OUTPUT);
 
-    Exception exception =
-        assertThrows(
-            ConnectorInputException.class,
-            () -> textractConnectorFunction.execute(outBounderContext));
-
-    assertThat(exception).isInstanceOf(ConnectorInputException.class);
+    assertThrows(ConnectorInputException.class, () -> textractConnectorFunction.execute(outBounderContext));
   }
 
   @ParameterizedTest

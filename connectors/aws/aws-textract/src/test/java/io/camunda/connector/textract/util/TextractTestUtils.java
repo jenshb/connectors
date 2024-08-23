@@ -38,7 +38,7 @@ public class TextractTestUtils {
                       "region": "eu-central-1"
                    },
                    "authentication": {
-                      "type": "defaultCredentialsChain",
+                      "type": "credentials",
                       "accessKey": "{{secrets.ACCESS_KEY}}",
                       "secretKey": "{{secrets.SECRET_KEY}}"
                    }
@@ -70,7 +70,7 @@ public class TextractTestUtils {
                           "region": "eu-central-1"
                        },
                        "authentication": {
-                          "type": "defaultCredentialsChain",
+                          "type": "credentials",
                           "accessKey": "{{secrets.ACCESS_KEY}}",
                           "secretKey": "{{secrets.SECRET_KEY}}"
                        }
@@ -101,7 +101,7 @@ public class TextractTestUtils {
                               "region": "eu-central-1"
                            },
                            "authentication": {
-                              "type": "defaultCredentialsChain",
+                              "type": "credentials",
                               "accessKey": "{{secrets.ACCESS_KEY}}",
                               "secretKey": "{{secrets.SECRET_KEY}}"
                            }
@@ -133,7 +133,7 @@ public class TextractTestUtils {
                               "region": "eu-central-1"
                            },
                            "authentication": {
-                              "type": "defaultCredentialsChain",
+                              "type": "credentials",
                               "accessKey": "{{secrets.ACCESS_KEY}}",
                               "secretKey": "{{secrets.SECRET_KEY}}"
                            }
@@ -158,7 +158,7 @@ public class TextractTestUtils {
                       "region": "eu-central-1"
                    },
                    "authentication": {
-                      "type": "defaultCredentialsChain",
+                      "type": "credentials",
                       "accessKey": "{{secrets.ACCESS_KEY}}",
                       "secretKey": "{{secrets.SECRET_KEY}}"
                    }
@@ -184,7 +184,7 @@ public class TextractTestUtils {
                       "region": "eu-central-1"
                    },
                    "authentication": {
-                      "type": "defaultCredentialsChain",
+                      "type": "credentials",
                       "accessKey": "{{secrets.ACCESS_KEY}}",
                       "secretKey": "{{secrets.SECRET_KEY}}"
                    }
