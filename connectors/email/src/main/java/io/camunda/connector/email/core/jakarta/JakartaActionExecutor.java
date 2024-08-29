@@ -74,6 +74,7 @@ public class JakartaActionExecutor implements ActionExecutor {
                 email ->
                     new ReadEmailResponse(
                         email.getMessageId(),
+                        List.of(),
                         email.getFrom(),
                         email.getSubject(),
                         email.getSize(),
@@ -190,6 +191,7 @@ public class JakartaActionExecutor implements ActionExecutor {
                   email ->
                       new ReadEmailResponse(
                           email.getMessageId(),
+                          List.of(),
                           email.getFrom(),
                           email.getSubject(),
                           email.getSize(),
@@ -242,6 +244,7 @@ public class JakartaActionExecutor implements ActionExecutor {
       if (to.isPresent()) message.setRecipients(Message.RecipientType.TO, to.get());
       if (cc.isPresent()) message.setRecipients(Message.RecipientType.CC, cc.get());
       if (cci.isPresent()) message.setRecipients(Message.RecipientType.BCC, cci.get());
+      message.setContent(smtpSendEmail.getAttachment().asByteArray(), "image/svg+xml");
       message.setSubject(smtpSendEmail.getSubject());
       message.setText(smtpSendEmail.getBody());
       try (Transport transport = session.getTransport()) {

@@ -9,6 +9,9 @@ package io.camunda.connector.email.core.jakarta;
 import io.camunda.connector.api.inbound.InboundConnectorContext;
 import io.camunda.connector.email.authentication.Authentication;
 import io.camunda.connector.email.inbound.model.EmailProperties;
+import io.camunda.connector.email.response.ReadEmailResponse;
+import io.camunda.document.Document;
+import io.camunda.document.store.DocumentCreationRequest;
 import jakarta.mail.*;
 import jakarta.mail.event.MessageCountEvent;
 import jakarta.mail.event.MessageCountListener;
@@ -16,6 +19,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.eclipse.angus.mail.imap.IMAPFolder;
@@ -89,14 +93,33 @@ public class JakartaEmailListener {
       boolean markAsRead) {
     IMAPFolder imapFolder = (IMAPFolder) e.getSource();
     if (triggerAdded) {
-      connectorContext.correlateWithResult(
-          Arrays.stream(e.getMessages())
-              .peek(
-                  message -> {
-                    if (markAsRead) this.jakartaUtils.markAsSeen(message);
-                  })
-              .map(Email::createEmail)
-              .toList());
+      Arrays.stream(e.getMessages())
+          .peek(
+              message -> {
+                if (markAsRead) this.jakartaUtils.markAsSeen(message);
+              })
+          .map(Email::createEmail)
+          .forEach(
+              email -> {
+                List<Document> documents =
+                    email.getBody().getAttachments().stream()
+                        .map(
+                            document ->
+                                connectorContext.createDocument(
+                                    DocumentCreationRequest.from(document)
+                                        .metadata(Map.of())
+                                        .build()))
+                        .toList();
+                connectorContext.correlateWithResult(
+                    new ReadEmailResponse(
+                        email.getMessageId(),
+                        documents,
+                        email.getFrom(),
+                        email.getSubject(),
+                        email.getSize(),
+                        email.getBody().getBodyAsPlainText(),
+                        email.getBody().getBodyAsHtml()));
+              });
     }
     try {
       idleManager.watch(imapFolder);

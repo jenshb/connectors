@@ -75,6 +75,9 @@
                             </features>
                         </connector>
                     </connectors>
+                    <includeDependencies>
+                        <includeDependency>io.camunda.connector:connector-document</includeDependency>
+                    </includeDependencies>
                 </configuration>
             </plugin>
         </plugins>

@@ -489,6 +489,28 @@
     },
     "type" : "String"
   }, {
+    "id" : "attachmentSmtp",
+    "label" : "Attachment",
+    "optional" : true,
+    "feel" : "required",
+    "group" : "sendEmailSmtp",
+    "binding" : {
+      "name" : "data.smtpAction.attachment",
+      "type" : "zeebe:input"
+    },
+    "condition" : {
+      "allMatch" : [ {
+        "property" : "data.smtpActionDiscriminator",
+        "equals" : "sendEmailSmtp",
+        "type" : "simple"
+      }, {
+        "property" : "protocol",
+        "equals" : "smtp",
+        "type" : "simple"
+      } ]
+    },
+    "type" : "String"
+  }, {
     "id" : "smtpCc",
     "label" : "CC",
     "description" : "Comma-separated list of email, e.g., 'email1@domain.com,email2@domain.com' or '=[ \"email1@domain.com\", \"email2@domain.com\"]'",

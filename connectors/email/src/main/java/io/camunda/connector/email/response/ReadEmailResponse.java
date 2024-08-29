@@ -6,10 +6,12 @@
  */
 package io.camunda.connector.email.response;
 
+import io.camunda.document.Document;
 import java.util.List;
 
 public record ReadEmailResponse(
     String uidl,
+    List<Document> documents,
     List<String> fromAddresses,
     String subject,
     Integer size,
