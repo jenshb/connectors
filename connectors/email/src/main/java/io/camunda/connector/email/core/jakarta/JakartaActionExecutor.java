@@ -21,7 +21,6 @@ import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.search.*;
 import java.util.*;
 import org.eclipse.angus.mail.imap.IMAPFolder;
-import org.eclipse.angus.mail.pop3.POP3Folder;
 
 public class JakartaActionExecutor implements ActionExecutor {
 
@@ -160,7 +159,7 @@ public class JakartaActionExecutor implements ActionExecutor {
       Pop3DeleteEmail pop3DeleteEmail, Authentication authentication, Session session) {
     try (Store store = session.getStore()) {
       this.sessionFactory.connectStore(store, authentication);
-      try (POP3Folder folder = (POP3Folder) store.getDefaultFolder()) {
+      try (Folder folder = store.getFolder("INBOX")) {
         folder.open(Folder.READ_WRITE);
         Message[] messages = folder.search(new MessageIDTerm(pop3DeleteEmail.getMessageId()));
         Message message =
@@ -181,7 +180,7 @@ public class JakartaActionExecutor implements ActionExecutor {
     try {
       try (Store store = session.getStore()) {
         this.sessionFactory.connectStore(store, authentication);
-        try (POP3Folder folder = (POP3Folder) store.getDefaultFolder()) {
+        try (Folder folder = store.getFolder("INBOX")) {
           folder.open(Folder.READ_WRITE);
           Message[] messages = folder.search(new MessageIDTerm(pop3ReadEmail.getMessageId()));
           return Arrays.stream(messages)
@@ -209,7 +208,7 @@ public class JakartaActionExecutor implements ActionExecutor {
     try {
       try (Store store = session.getStore()) {
         this.sessionFactory.connectStore(store, authentication);
-        try (POP3Folder folder = (POP3Folder) store.getDefaultFolder()) {
+        try (Folder folder = store.getFolder("INBOX")) {
           folder.open(Folder.READ_ONLY);
           return Arrays.stream(folder.getMessages())
               .map(Email::createBodylessEmail)
