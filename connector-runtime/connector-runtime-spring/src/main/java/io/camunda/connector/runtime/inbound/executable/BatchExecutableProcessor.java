@@ -97,43 +97,45 @@ public class BatchExecutableProcessor {
           activateSingle(
               data, t -> cancellationCallback.accept(new InboundExecutableEvent.Cancelled(id, t)));
 
-      switch (result) {
-        case Activated activated -> alreadyActivated.put(id, activated);
-        case ConnectorNotRegistered notRegistered -> alreadyActivated.put(id, notRegistered);
-        case InvalidDefinition invalid -> alreadyActivated.put(id, invalid);
-        case RegisteredExecutable.Cancelled cancelled -> alreadyActivated.put(id, cancelled);
-        case FailedToActivate failed -> {
-          LOG.error(
-              "Failed to activate connector of type '{}' with deduplication ID '{}', reason: {}. "
-                  + "All previously activated executables from this batch will be discarded.",
-              failed.data().type(),
-              failed.data().deduplicationId(),
-              failed.reason());
+      if (result instanceof Activated activated) {
+        alreadyActivated.put(id, activated);
+      } else if (result instanceof ConnectorNotRegistered notRegistered) {
+        alreadyActivated.put(id, notRegistered);
+      } else if (result instanceof InvalidDefinition invalid) {
+        alreadyActivated.put(id, invalid);
+      } else if (result instanceof RegisteredExecutable.Cancelled cancelled) {
+        alreadyActivated.put(id, cancelled);
+      } else if (result instanceof FailedToActivate failed) {
+        LOG.error(
+            "Failed to activate connector of type '{}' with deduplication ID '{}', reason: {}. "
+                + "All previously activated executables from this batch will be discarded.",
+            failed.data().type(),
+            failed.data().deduplicationId(),
+            failed.reason());
 
-          // deactivate all previously activated connectors
-          deactivateBatch(new ArrayList<>(alreadyActivated.values()));
+        // deactivate all previously activated connectors
+        deactivateBatch(new ArrayList<>(alreadyActivated.values()));
 
-          var failureReasonForOthers =
-              "Process contains invalid connector(s): "
-                  + String.join(
-                      ", ",
-                      failed.data().connectorElements().stream()
-                          .map(e -> e.element().elementId())
-                          .toList())
-                  + ". Reason: "
-                  + failed.reason();
+        var failureReasonForOthers =
+            "Process contains invalid connector(s): "
+                + String.join(
+                    ", ",
+                    failed.data().connectorElements().stream()
+                        .map(e -> e.element().elementId())
+                        .toList())
+                + ". Reason: "
+                + failed.reason();
 
-          Map<UUID, RegisteredExecutable> notActivated = new HashMap<>();
-          for (var failedEntry : request.entrySet()) {
-            if (!failedEntry.getKey().equals(id)) {
-              notActivated.put(
-                  failedEntry.getKey(),
-                  new FailedToActivate(failedEntry.getValue(), failureReasonForOthers));
-            }
+        Map<UUID, RegisteredExecutable> notActivated = new HashMap<>();
+        for (var failedEntry : request.entrySet()) {
+          if (!failedEntry.getKey().equals(id)) {
+            notActivated.put(
+                failedEntry.getKey(),
+                new FailedToActivate(failedEntry.getValue(), failureReasonForOthers));
           }
-          notActivated.put(id, failed);
-          return notActivated;
         }
+        notActivated.put(id, failed);
+        return notActivated;
       }
     }
     return alreadyActivated;
