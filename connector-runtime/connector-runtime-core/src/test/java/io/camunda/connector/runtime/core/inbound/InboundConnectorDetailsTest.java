@@ -45,7 +45,7 @@ public class InboundConnectorDetailsTest {
 
     // when & then
     assertDoesNotThrow(
-        () -> InboundConnectorDetails.of(elements.getFirst().deduplicationId(List.of()), elements));
+        () -> InboundConnectorDetails.of(elements.get(0).deduplicationId(List.of()), elements));
   }
 
   @Test
@@ -66,7 +66,7 @@ public class InboundConnectorDetailsTest {
 
     // when & then
     var result =
-        InboundConnectorDetails.of(elements.getFirst().deduplicationId(List.of()), elements);
+        InboundConnectorDetails.of(elements.get(0).deduplicationId(List.of()), elements);
     assertThat(result).isInstanceOf(InboundConnectorDetails.InvalidInboundConnectorDetails.class);
     var invalid = (InboundConnectorDetails.InvalidInboundConnectorDetails) result;
     assertThat(invalid.error()).isInstanceOf(IllegalArgumentException.class);
@@ -97,7 +97,7 @@ public class InboundConnectorDetailsTest {
 
     // when & then
     var result =
-        InboundConnectorDetails.of(elements.getFirst().deduplicationId(List.of()), elements);
+        InboundConnectorDetails.of(elements.get(0).deduplicationId(List.of()), elements);
     assertThat(result).isInstanceOf(InboundConnectorDetails.InvalidInboundConnectorDetails.class);
     var invalid = (InboundConnectorDetails.InvalidInboundConnectorDetails) result;
     assertThat(invalid.error()).isInstanceOf(IllegalArgumentException.class);
@@ -131,7 +131,7 @@ public class InboundConnectorDetailsTest {
 
     // when & then
     var result =
-        InboundConnectorDetails.of(elements.getFirst().deduplicationId(List.of()), elements);
+        InboundConnectorDetails.of(elements.get(0).deduplicationId(List.of()), elements);
     assertThat(result).isInstanceOf(InboundConnectorDetails.InvalidInboundConnectorDetails.class);
     var invalid = (InboundConnectorDetails.InvalidInboundConnectorDetails) result;
     assertThat(invalid.error()).isInstanceOf(IllegalArgumentException.class);

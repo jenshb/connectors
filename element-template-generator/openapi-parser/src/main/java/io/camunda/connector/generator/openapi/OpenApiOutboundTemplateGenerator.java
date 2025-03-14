@@ -99,7 +99,7 @@ public class OpenApiOutboundTemplateGenerator
     if (templates.isEmpty()) {
       throw new IllegalArgumentException("No operations found in OpenAPI document");
     }
-    var template = templates.getFirst();
+    var template = templates.get(0);
     return new ScanResult(
         template.id(),
         template.name(),

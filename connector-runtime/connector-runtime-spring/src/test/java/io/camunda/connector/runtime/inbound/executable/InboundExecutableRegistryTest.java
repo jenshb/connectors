@@ -84,8 +84,8 @@ public class InboundExecutableRegistryTest {
 
     // then
     var result = registry.query(new ActiveExecutableQuery(null, elementId, null, null));
-    assertThat(result.getFirst().health().getStatus()).isEqualTo(Status.DOWN);
-    assertThat(result.getFirst().health().getError().message())
+    assertThat(result.get(0).health().getStatus()).isEqualTo(Status.DOWN);
+    assertThat(result.get(0).health().getError().message())
         .isEqualTo("Invalid connector definition: All elements in a group must have the same type");
   }
 
@@ -160,8 +160,8 @@ public class InboundExecutableRegistryTest {
 
     // then
     var result = registry.query(new ActiveExecutableQuery(null, elementId, null, null));
-    assertThat(result.getFirst().health().getStatus()).isEqualTo(Status.DOWN);
-    assertThat(result.getFirst().health().getError().message()).isEqualTo("failed");
+    assertThat(result.get(0).health().getStatus()).isEqualTo(Status.DOWN);
+    assertThat(result.get(0).health().getError().message()).isEqualTo("failed");
   }
 
   @Test
@@ -272,8 +272,8 @@ public class InboundExecutableRegistryTest {
 
     // then
     var result = registry.query(new ActiveExecutableQuery(null, elementId, null, null));
-    assertThat(result.getFirst().health().getStatus()).isEqualTo(Status.DOWN);
-    assertThat(result.getFirst().health().getError().message())
+    assertThat(result.get(0).health().getStatus()).isEqualTo(Status.DOWN);
+    assertThat(result.get(0).health().getError().message())
         .isEqualTo("Connector unknown-type not registered");
   }
 

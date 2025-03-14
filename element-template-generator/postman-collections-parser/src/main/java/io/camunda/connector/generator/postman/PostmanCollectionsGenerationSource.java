@@ -46,7 +46,7 @@ public record PostmanCollectionsGenerationSource(
       throw new IllegalArgumentException("Incorrect usage");
     }
 
-    final var collectionPathOrContent = cliParams.getFirst();
+    final var collectionPathOrContent = cliParams.get(0);
 
     JsonNode collectionNode =
         Optional.ofNullable(collectionPathOrContent)

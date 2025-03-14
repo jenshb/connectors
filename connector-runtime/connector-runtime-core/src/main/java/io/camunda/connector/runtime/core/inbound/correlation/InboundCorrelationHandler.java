@@ -272,7 +272,7 @@ public class InboundCorrelationHandler {
       return new ActivationCheckResult.Failure.TooManyMatchingElements();
     }
     return new ActivationCheckResult.Success.CanActivate(
-        processElementContextFactory.createContext(matchingElements.getFirst()));
+        processElementContextFactory.createContext(matchingElements.get(0)));
   }
 
   protected boolean isActivationConditionMet(InboundConnectorElement definition, Object context) {

@@ -39,49 +39,49 @@ public class ProcessDefinitionInspectorUtilTests {
   public void testSingleWebhookInCollaboration() {
     var inboundConnectors = fromModel("single-webhook-collaboration.bpmn", "process");
     assertEquals(1, inboundConnectors.size());
-    assertEquals("start_event", inboundConnectors.getFirst().element().elementId());
+    assertEquals("start_event", inboundConnectors.get(0).element().elementId());
   }
 
   @Test
   public void testMultipleWebhooksInCollaborationP1() {
     var inboundConnectors = fromModel("multi-webhook-collaboration.bpmn", "process1");
     assertEquals(1, inboundConnectors.size());
-    assertEquals("start_event", inboundConnectors.getFirst().element().elementId());
+    assertEquals("start_event", inboundConnectors.get(0).element().elementId());
   }
 
   @Test
   public void testMultipleWebhooksInCollaborationP2() {
     var inboundConnectors = fromModel("multi-webhook-collaboration.bpmn", "process2");
     assertEquals(1, inboundConnectors.size());
-    assertEquals("intermediate_event", inboundConnectors.getFirst().element().elementId());
+    assertEquals("intermediate_event", inboundConnectors.get(0).element().elementId());
   }
 
   @Test
   public void testMultipleWebhookStartEventsInCollaborationP1() {
     var inboundConnectors = fromModel("multi-webhook-start-collaboration.bpmn", "process1");
     assertEquals(1, inboundConnectors.size());
-    assertEquals("start_1", inboundConnectors.getFirst().element().elementId());
+    assertEquals("start_1", inboundConnectors.get(0).element().elementId());
   }
 
   @Test
   public void testMultipleWebhookStartEventsInCollaborationP2() {
     var inboundConnectors = fromModel("multi-webhook-start-collaboration.bpmn", "process2");
     assertEquals(1, inboundConnectors.size());
-    assertEquals("start_2", inboundConnectors.getFirst().element().elementId());
+    assertEquals("start_2", inboundConnectors.get(0).element().elementId());
   }
 
   @Test
   public void testSingleWebhookBoundaryEvent() {
     var inboundConnectors = fromModel("single-webhook-boundary.bpmn", "BoundaryEventTest");
     assertEquals(1, inboundConnectors.size());
-    assertEquals("boundary_event", inboundConnectors.getFirst().element().elementId());
+    assertEquals("boundary_event", inboundConnectors.get(0).element().elementId());
   }
 
   @Test
   public void testSingleWebhookSubprocess() {
     var inboundConnectors = fromModel("single-webhook-subprocess.bpmn", "subprocess_webhook");
     assertEquals(1, inboundConnectors.size());
-    assertEquals("webhook_in_subprocess", inboundConnectors.getFirst().element().elementId());
+    assertEquals("webhook_in_subprocess", inboundConnectors.get(0).element().elementId());
   }
 
   @Test
@@ -89,7 +89,7 @@ public class ProcessDefinitionInspectorUtilTests {
     var inboundConnectors =
         fromModel("single-kafka-consumer-subprocess.bpmn", "kafka-consumer-subprocess");
     assertEquals(1, inboundConnectors.size());
-    assertEquals("kafka_in_subprocess", inboundConnectors.getFirst().element().elementId());
+    assertEquals("kafka_in_subprocess", inboundConnectors.get(0).element().elementId());
   }
 
   @Test
@@ -114,7 +114,7 @@ public class ProcessDefinitionInspectorUtilTests {
     var inboundConnectors =
         fromModel(
             "multi-webhook-start-message-duplicate-property.bpmn", "multi-webhook-start-message");
-    Assertions.assertEquals("firstRes", inboundConnectors.getFirst().resultVariable());
+    Assertions.assertEquals("firstRes", inboundConnectors.get(0).resultVariable());
     System.out.println(inboundConnectors);
   }
 

@@ -34,7 +34,7 @@ class PollingTextractCalllerTest {
     List<Pair<GetDocumentAnalysisRequest, GetDocumentAnalysisResult>> callSequence =
         getRequestResponseSequence();
     Pair<GetDocumentAnalysisRequest, GetDocumentAnalysisResult> firstRequestResp =
-        callSequence.getFirst();
+        callSequence.get(0);
 
     AmazonTextractAsyncClient asyncClient = Mockito.mock(AmazonTextractAsyncClient.class);
     StartDocumentAnalysisResult startDocRequest =

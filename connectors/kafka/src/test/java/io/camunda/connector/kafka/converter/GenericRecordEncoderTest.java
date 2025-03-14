@@ -42,13 +42,13 @@ public class GenericRecordEncoderTest {
     record.put("emails", List.of("test@camunda.com"));
     record.put("nickname", "JD");
     GenericRecord boss =
-        new GenericData.Record(schema.getField("boss").schema().getTypes().getFirst());
+        new GenericData.Record(schema.getField("boss").schema().getTypes().get(0));
     boss.put("name", "Jane Doe");
     boss.put("position", "CEO");
     record.put("boss", boss);
     GenericRecord colleague =
         new GenericData.Record(
-            schema.getField("colleagues").schema().getTypes().getFirst().getElementType());
+            schema.getField("colleagues").schema().getTypes().get(0).getElementType());
     colleague.put("name", "Alice");
     colleague.put("age", 25);
     colleague.put("emails", List.of("alice@camunda.com"));

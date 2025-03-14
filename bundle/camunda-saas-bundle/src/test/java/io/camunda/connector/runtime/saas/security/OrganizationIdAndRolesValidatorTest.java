@@ -126,7 +126,7 @@ public class OrganizationIdAndRolesValidatorTest {
     // then
     assertThat(result.hasErrors()).isTrue();
     assertThat(result.getErrors().size()).isEqualTo(1);
-    assertThat(new ArrayList<>(result.getErrors()).getFirst().toString())
+    assertThat(new ArrayList<>(result.getErrors()).get(0).toString())
         .isEqualTo(
             "[invalid_token] The 'https://camunda.com/orgs' claim has no id matching the organization id: [organizationId] or the roles are not in the allowed roles: [allowedRoles]");
   }
@@ -160,7 +160,7 @@ public class OrganizationIdAndRolesValidatorTest {
     // then
     assertThat(result.hasErrors()).isTrue();
     assertThat(result.getErrors().size()).isEqualTo(1);
-    assertThat(new ArrayList<>(result.getErrors()).getFirst().toString())
+    assertThat(new ArrayList<>(result.getErrors()).get(0).toString())
         .isEqualTo(
             "[invalid_token] The 'https://camunda.com/orgs' claim has no id matching the organization id: [organizationId] or the roles are not in the allowed roles: [allowedRoles]");
   }
@@ -195,7 +195,7 @@ public class OrganizationIdAndRolesValidatorTest {
     // then
     assertThat(result.hasErrors()).isTrue();
     assertThat(result.getErrors().size()).isEqualTo(1);
-    assertThat(new ArrayList<>(result.getErrors()).getFirst().toString())
+    assertThat(new ArrayList<>(result.getErrors()).get(0).toString())
         .isEqualTo(
             "[invalid_token] The 'https://camunda.com/orgs' claim has no id matching the organization id: [organizationId] or the roles are not in the allowed roles: [allowedRoles]");
   }
@@ -229,7 +229,7 @@ public class OrganizationIdAndRolesValidatorTest {
     // then
     assertThat(result.hasErrors()).isTrue();
     assertThat(result.getErrors().size()).isEqualTo(1);
-    assertThat(new ArrayList<>(result.getErrors()).getFirst().toString())
+    assertThat(new ArrayList<>(result.getErrors()).get(0).toString())
         .isEqualTo(
             "[invalid_token] The 'https://camunda.com/orgs' claim has no id matching the organization id: [organizationId] or the roles are not in the allowed roles: [allowedRoles]");
   }
@@ -263,7 +263,7 @@ public class OrganizationIdAndRolesValidatorTest {
     // then
     assertThat(result.hasErrors()).isTrue();
     assertThat(result.getErrors().size()).isEqualTo(1);
-    assertThat(new ArrayList<>(result.getErrors()).getFirst().toString())
+    assertThat(new ArrayList<>(result.getErrors()).get(0).toString())
         .isEqualTo(
             "[invalid_token] The 'https://camunda.com/orgs' claim has no id matching the organization id: [organizationId] or the roles are not in the allowed roles: [allowedRoles]");
   }
@@ -289,7 +289,7 @@ public class OrganizationIdAndRolesValidatorTest {
     // then
     assertThat(result.hasErrors()).isTrue();
     assertThat(result.getErrors().size()).isEqualTo(1);
-    assertThat(new ArrayList<>(result.getErrors()).getFirst().toString())
+    assertThat(new ArrayList<>(result.getErrors()).get(0).toString())
         .isEqualTo(
             "[invalid_token] The 'https://camunda.com/orgs' claim has no id matching the organization id: [organizationId] or the roles are not in the allowed roles: [allowedRoles]");
   }
@@ -307,7 +307,7 @@ public class OrganizationIdAndRolesValidatorTest {
     // then
     assertThat(result.hasErrors()).isTrue();
     assertThat(result.getErrors().size()).isEqualTo(1);
-    assertThat(new ArrayList<>(result.getErrors()).getFirst().toString())
+    assertThat(new ArrayList<>(result.getErrors()).get(0).toString())
         .isEqualTo("[invalid_token] The required 'https://camunda.com/orgs' claim is missing");
   }
 }

@@ -125,7 +125,7 @@ public class FileUploader {
 
   // In fact, we always have only one file in List
   private File getFirst(List<File> files) {
-    return files == null || files.isEmpty() ? null : files.getFirst();
+    return files == null || files.isEmpty() ? null : files.get(0);
   }
 
   public void setMethodsClient(MethodsClient methodsClient) {

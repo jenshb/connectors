@@ -112,10 +112,10 @@ public class OutboundEmailTests extends BaseEmailTest {
     assertTrue(super.waitForNewEmails(5000, 1));
     List<Message> message = List.of(super.getLastReceivedEmails());
     assertThat(message).isNotNull();
-    assertThat(getSenders(message.getFirst())).hasSize(1).first().isEqualTo("test@camunda.com");
-    assertThat(getReceivers(message.getFirst())).hasSize(1).first().isEqualTo("receiver@test.com");
-    assertThat(getSubject(message.getFirst())).isEqualTo("subject");
-    assertThat(getPlainTextBody(message.getFirst())).isEqualTo("content");
+    assertThat(getSenders(message.get(0))).hasSize(1).first().isEqualTo("test@camunda.com");
+    assertThat(getReceivers(message.get(0))).hasSize(1).first().isEqualTo("receiver@test.com");
+    assertThat(getSubject(message.get(0))).isEqualTo("subject");
+    assertThat(getPlainTextBody(message.get(0))).isEqualTo("content");
   }
 
   @Test
@@ -148,10 +148,10 @@ public class OutboundEmailTests extends BaseEmailTest {
     assertTrue(super.waitForNewEmails(5000, 1));
     List<Message> message = List.of(super.getLastReceivedEmails());
     assertThat(message).isNotNull();
-    assertThat(getSenders(message.getFirst())).hasSize(1).first().isEqualTo("test@camunda.com");
-    assertThat(getReceivers(message.getFirst())).hasSize(1).first().isEqualTo("receiver@test.com");
-    assertThat(getSubject(message.getFirst())).isEqualTo("subject");
-    assertThat(getHtmlBody(message.getFirst())).isEqualTo("<h1>content</h1>");
+    assertThat(getSenders(message.get(0))).hasSize(1).first().isEqualTo("test@camunda.com");
+    assertThat(getReceivers(message.get(0))).hasSize(1).first().isEqualTo("receiver@test.com");
+    assertThat(getSubject(message.get(0))).isEqualTo("subject");
+    assertThat(getHtmlBody(message.get(0))).isEqualTo("<h1>content</h1>");
   }
 
   @Test

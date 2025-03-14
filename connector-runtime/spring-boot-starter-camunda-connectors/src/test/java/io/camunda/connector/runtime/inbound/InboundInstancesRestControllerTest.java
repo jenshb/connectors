@@ -191,16 +191,16 @@ class InboundInstancesRestControllerTest {
     assertEquals("Webhook", instance1.connectorName());
     assertEquals(1, instance1.instances().size());
     assertEquals(UUID_1, instance1.instances().get(0).executableId());
-    assertEquals("ProcessA", instance1.instances().get(0).elements().getFirst().bpmnProcessId());
+    assertEquals("ProcessA", instance1.instances().get(0).elements().get(0).bpmnProcessId());
 
     var instance2 = instance.get(1);
     assertEquals(TYPE_2, instance2.connectorId());
     assertEquals("AnotherType", instance2.connectorName());
     assertEquals(2, instance2.instances().size());
     assertEquals(UUID_2, instance2.instances().get(0).executableId());
-    assertEquals("ProcessB", instance2.instances().get(0).elements().getFirst().bpmnProcessId());
+    assertEquals("ProcessB", instance2.instances().get(0).elements().get(0).bpmnProcessId());
     assertEquals(UUID_3, instance2.instances().get(1).executableId());
-    assertEquals("ProcessC", instance2.instances().get(1).elements().getFirst().bpmnProcessId());
+    assertEquals("ProcessC", instance2.instances().get(1).elements().get(0).bpmnProcessId());
   }
 
   @Test
@@ -231,7 +231,7 @@ class InboundInstancesRestControllerTest {
     assertEquals("Webhook", instance.connectorName());
     assertEquals(1, instance.instances().size());
     assertEquals(UUID_1, instance.instances().get(0).executableId());
-    assertEquals("ProcessA", instance.instances().get(0).elements().getFirst().bpmnProcessId());
+    assertEquals("ProcessA", instance.instances().get(0).elements().get(0).bpmnProcessId());
   }
 
   @Test
@@ -272,7 +272,7 @@ class InboundInstancesRestControllerTest {
         ConnectorsObjectMapperSupplier.getCopy()
             .readValue(response, ActiveInboundConnectorResponse.class);
     assertEquals(UUID_1, executable.executableId());
-    assertEquals("ProcessA", executable.elements().getFirst().bpmnProcessId());
+    assertEquals("ProcessA", executable.elements().get(0).bpmnProcessId());
   }
 
   @Test

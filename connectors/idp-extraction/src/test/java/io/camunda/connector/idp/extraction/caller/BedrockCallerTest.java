@@ -40,7 +40,7 @@ class BedrockCallerTest {
                 """;
 
     when(bedrockRuntimeClient.converse(any(Consumer.class))).thenReturn(converseResponse);
-    when(converseResponse.output().message().content().getFirst().text())
+    when(converseResponse.output().message().content().get(0).text())
         .thenReturn(expectedResponse);
 
     AwsProvider baseRequest = new AwsProvider();

@@ -97,7 +97,7 @@ public class WebhookControllerPlainJavaTests {
     assertFalse(webhook.isRegistered(processB1), "B1 is not registered");
     assertEquals(
         2,
-        connectorForPath1.get().context().getDefinition().elements().getFirst().version(),
+        connectorForPath1.get().context().getDefinition().elements().get(0).version(),
         "The newest one");
 
     var connectorForPath2 = webhook.getWebhookConnectorByContextPath("myPath2");

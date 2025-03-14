@@ -36,7 +36,7 @@ public class ConnectorDataMapper {
         if (executableClass != null
             && WebhookConnectorExecutable.class.isAssignableFrom(executableClass)) {
           try {
-            var properties = response.elements().getFirst().connectorLevelProperties();
+            var properties = response.elements().get(0).connectorLevelProperties();
             var contextPath = properties.get("inbound.context");
             data = Map.of("path", contextPath);
           } catch (Exception e) {
@@ -47,15 +47,15 @@ public class ConnectorDataMapper {
       };
 
   private Map<String, String> allPropertiesMapper(ActiveExecutableResponse response) {
-    return response.elements().getFirst().connectorLevelProperties();
+    return response.elements().get(0).connectorLevelProperties();
   }
 
   public ActiveInboundConnectorResponse createActiveInboundConnectorResponse(
       ActiveExecutableResponse connector,
       Function<ActiveExecutableResponse, Map<String, String>> dataMapper) {
     var elements = connector.elements();
-    var type = elements.getFirst().type();
-    var tenantId = elements.getFirst().element().tenantId();
+    var type = elements.get(0).type();
+    var tenantId = elements.get(0).element().tenantId();
     return new ActiveInboundConnectorResponse(
         connector.executableId(),
         type,

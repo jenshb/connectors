@@ -98,7 +98,7 @@ public class HttpCommonResultResponseHandler
                 },
                 (existingValue, newValue) -> {
                   if (existingValue instanceof List && newValue instanceof List) {
-                    ((List<String>) existingValue).add(((List<String>) newValue).getFirst());
+                    ((List<String>) existingValue).add(((List<String>) newValue).get(0));
                   }
                   return existingValue;
                 }));

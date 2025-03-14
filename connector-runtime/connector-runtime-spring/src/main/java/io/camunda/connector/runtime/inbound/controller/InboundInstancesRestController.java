@@ -55,7 +55,7 @@ public class InboundInstancesRestController {
     if (instances.isEmpty()) {
       throw new DataNotFoundException(ConnectorInstances.class, type);
     }
-    return instances.getFirst();
+    return instances.get(0);
   }
 
   @GetMapping("/{type}/executables/{executableId}")
@@ -66,7 +66,7 @@ public class InboundInstancesRestController {
     if (instances.isEmpty()) {
       throw new DataNotFoundException(ConnectorInstances.class, type);
     }
-    var instance = instances.getFirst();
+    var instance = instances.get(0);
     var executables =
         instance.instances().stream()
             .filter(
@@ -76,7 +76,7 @@ public class InboundInstancesRestController {
     if (executables.isEmpty()) {
       throw new DataNotFoundException(ActiveInboundConnectorResponse.class, executableId);
     }
-    return executables.getFirst();
+    return executables.get(0);
   }
 
   @GetMapping("/{type}/executables/{executableId}/logs")
@@ -92,7 +92,7 @@ public class InboundInstancesRestController {
               + executableId
               + ". This is not supported yet.");
     }
-    var processId = processIds.getFirst();
+    var processId = processIds.get(0);
     var result =
         executableRegistry
             .query(new ActiveExecutableQuery(processId, null, type, executable.tenantId()))

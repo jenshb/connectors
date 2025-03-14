@@ -80,9 +80,9 @@ class CreateChannelTest extends BaseTest {
     assertThat(value.getDisplayName()).isEqualTo(ActualValue.Channel.NAME);
     assertThat(value.getDescription()).isEqualTo(ActualValue.Channel.DESCRIPTION);
 
-    ConversationMember member = value.getMembers().getFirst();
+    ConversationMember member = value.getMembers().get(0);
 
-    assertThat(member.getRoles().getFirst()).isEqualTo(Member.OWNER_ROLES.getFirst());
+    assertThat(member.getRoles().get(0)).isEqualTo(Member.OWNER_ROLES.get(0));
     assertThat(member.getAdditionalData().get(Member.USER_DATA_BIND))
         .isEqualTo(Member.toAdditionalDataValue(ActualValue.Channel.OWNER));
   }

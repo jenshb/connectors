@@ -44,7 +44,7 @@ public class InboundConnectorDetailsUtil {
           extractRawProperties(groupedElements),
           groupedElements);
     } catch (Exception e) {
-      var anyElement = groupedElements.getFirst();
+      var anyElement = groupedElements.get(0);
       var tenantId = anyElement.element().tenantId();
       var type = anyElement.type();
       return new InvalidInboundConnectorDetails(
@@ -56,7 +56,7 @@ public class InboundConnectorDetailsUtil {
     if (elements.stream().map(InboundConnectorElement::type).distinct().count() > 1) {
       throw new IllegalArgumentException("All elements in a group must have the same type");
     }
-    return elements.getFirst().type();
+    return elements.get(0).type();
   }
 
   private static String extractTenantId(List<InboundConnectorElement> elements) {
@@ -68,7 +68,7 @@ public class InboundConnectorDetailsUtil {
         > 1) {
       throw new IllegalArgumentException("All elements in a group must have the same tenant ID");
     }
-    return elements.getFirst().element().tenantId();
+    return elements.get(0).element().tenantId();
   }
 
   private static Map<String, String> extractRawProperties(List<InboundConnectorElement> elements) {
@@ -83,7 +83,7 @@ public class InboundConnectorDetailsUtil {
           "All elements in a group must have the same properties (excluding runtime-level properties). The following properties are different: "
               + String.join(", ", divergingProperties));
     }
-    return elements.getFirst().rawProperties();
+    return elements.get(0).rawProperties();
   }
 
   private static Set<String> getDivergingProperties(

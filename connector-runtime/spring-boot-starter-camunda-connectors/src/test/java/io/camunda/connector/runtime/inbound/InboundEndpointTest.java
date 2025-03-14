@@ -83,7 +83,7 @@ public class InboundEndpointTest {
 
     var response = statusController.getActiveInboundConnectors(null, null, null);
     assertEquals(1, response.size());
-    assertEquals("myPath", response.getFirst().data().get("path"));
+    assertEquals("myPath", response.get(0).data().get("path"));
   }
 
   @Test
@@ -110,6 +110,6 @@ public class InboundEndpointTest {
 
     var response = statusController.getActiveInboundConnectors(null, null, null);
     assertEquals(1, response.size());
-    assertEquals(Health.down(), (response.getFirst()).health());
+    assertEquals(Health.down(), (response.get(0)).health());
   }
 }

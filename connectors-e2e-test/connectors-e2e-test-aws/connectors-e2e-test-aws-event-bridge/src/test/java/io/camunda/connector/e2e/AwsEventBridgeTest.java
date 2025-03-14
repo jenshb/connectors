@@ -143,7 +143,7 @@ public class AwsEventBridgeTest extends BaseAwsTest {
     ObjectMapper objectMapper = ObjectMapperSupplier.getMapperInstance();
 
     // Parse the body of the first message
-    var dataMap = objectMapper.readValue(messages.getFirst().getBody(), Map.class);
+    var dataMap = objectMapper.readValue(messages.get(0).getBody(), Map.class);
 
     // Assert the expected values
     assertEquals(SOURCE, dataMap.get("source"));

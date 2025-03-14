@@ -377,8 +377,8 @@ public class KafkaIntegrationTest {
     KafkaInboundMessage castedResult1 = (KafkaInboundMessage) inboundMessage;
     assertMessage(castedResult1);
 
-    assertInstanceOf(KafkaInboundMessage.class, context.getCorrelations().getFirst());
-    KafkaInboundMessage castedResult2 = (KafkaInboundMessage) context.getCorrelations().getFirst();
+    assertInstanceOf(KafkaInboundMessage.class, context.getCorrelations().get(0));
+    KafkaInboundMessage castedResult2 = (KafkaInboundMessage) context.getCorrelations().get(0);
     assertMessage(castedResult2);
   }
 

@@ -103,7 +103,7 @@ class InboundConnectorContextImplTest {
     TestPropertiesClass propertiesAsType =
         inboundConnectorContext.bindProperties(TestPropertiesClass.class);
     // then
-    assertThat(propertiesAsType.getMapWithStringListWithNumbers().get("key").getFirst())
+    assertThat(propertiesAsType.getMapWithStringListWithNumbers().get("key").get(0))
         .isInstanceOf(String.class);
   }
 

@@ -193,7 +193,7 @@ public class JakartaUtils {
               .map(Address::toString)
               .map(address -> address.replaceAll(".*<|>.*", ""))
               .toList()
-              .getFirst();
+              .get(0);
       List<String> to =
           Arrays.stream(
                   Optional.ofNullable(message.getRecipients(Message.RecipientType.TO))

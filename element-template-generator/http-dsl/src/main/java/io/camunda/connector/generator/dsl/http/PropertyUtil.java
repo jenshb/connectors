@@ -67,7 +67,7 @@ public class PropertyUtil {
         .label("Authentication")
         .optional(false)
         .binding(new ZeebeInput("authentication.type"))
-        .value(choices.getFirst().value());
+        .value(choices.get(0).value());
   }
 
   static PropertyGroup operationDiscriminatorPropertyGroup(Collection<HttpOperation> operations) {

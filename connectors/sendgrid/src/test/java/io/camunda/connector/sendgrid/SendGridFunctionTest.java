@@ -206,7 +206,7 @@ public class SendGridFunctionTest extends BaseTest {
     var documentMetadata = mock(DocumentMetadata.class);
     when(document.metadata()).thenReturn(documentMetadata);
 
-    String fileName = request.getAttachments().getFirst().metadata().getFileName();
+    String fileName = request.getAttachments().get(0).metadata().getFileName();
     when(documentMetadata.getFileName()).thenReturn(fileName);
     when(document.asInputStream()).thenReturn(new ByteArrayInputStream(new byte[0]));
 

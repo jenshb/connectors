@@ -242,7 +242,7 @@ public class InboundExecutableRegistryImpl implements InboundExecutableRegistry 
     } else if (executable instanceof FailedToActivate failed) {
       elements =
           failed.data().connectorElements().stream().map(InboundConnectorElement::element).toList();
-      type = failed.data().connectorElements().getFirst().type();
+      type = failed.data().connectorElements().get(0).type();
     } else if (executable instanceof ConnectorNotRegistered notRegistered) {
       elements =
           notRegistered.data().connectorElements().stream()
@@ -254,7 +254,7 @@ public class InboundExecutableRegistryImpl implements InboundExecutableRegistry 
           invalid.data().connectorElements().stream()
               .map(InboundConnectorElement::element)
               .toList();
-      type = invalid.data().connectorElements().getFirst().type();
+      type = invalid.data().connectorElements().get(0).type();
     } else if (executable instanceof Cancelled cancelled) {
       elements =
           cancelled.context().connectorElements().stream()
@@ -352,7 +352,7 @@ public class InboundExecutableRegistryImpl implements InboundExecutableRegistry 
                   if (activeExecutable instanceof Activated activated) {
                     return activated.context().getDefinition().type();
                   } else if (activeExecutable instanceof FailedToActivate failed) {
-                    return failed.data().connectorElements().getFirst().type();
+                    return failed.data().connectorElements().get(0).type();
                   } else if (activeExecutable instanceof ConnectorNotRegistered notRegistered) {
                     return notRegistered.data().type();
                   } else if (activeExecutable instanceof InvalidDefinition invalid) {

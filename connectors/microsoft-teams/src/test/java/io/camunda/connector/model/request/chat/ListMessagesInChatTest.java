@@ -65,7 +65,7 @@ class ListMessagesInChatTest extends BaseTest {
     assertThat(value.getQueryParameters().get("%24top"))
         .isEqualTo(Integer.valueOf(ActualValue.Channel.TOP));
     assertThat(value.getQueryParameters().get("%24filter")).isEqualTo(ActualValue.Chat.FILTER);
-    assertThat(((List<String>) value.getQueryParameters().get("%24orderby")).getFirst())
+    assertThat(((List<String>) value.getQueryParameters().get("%24orderby")).get(0))
         .isEqualTo(OrderBy.createdDateTime.getValue());
   }
 

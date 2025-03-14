@@ -151,7 +151,7 @@ public class InboundClassBasedTemplateGeneratorTest extends BaseTest {
 
       // then
       assertThat(templates).hasSize(1);
-      var template = templates.getFirst();
+      var template = templates.get(0);
       var property = getPropertyById("messageNameUuid", template);
       assertThat(property).isNotNull();
       assertThat(property.getType()).isEqualTo("Hidden");
@@ -174,7 +174,7 @@ public class InboundClassBasedTemplateGeneratorTest extends BaseTest {
 
       // then
       assertThat(templates).hasSize(1);
-      var template = templates.getFirst();
+      var template = templates.get(0);
       assertThrows(Exception.class, () -> getPropertyById("messageNameUuid", template));
     }
 
@@ -234,7 +234,7 @@ public class InboundClassBasedTemplateGeneratorTest extends BaseTest {
 
       // then
       assertThat(templates).hasSize(1);
-      var template = templates.getFirst();
+      var template = templates.get(0);
       var correlationRequiredProperty = getPropertyById("correlationRequired", template);
       assertThat(correlationRequiredProperty).isNotNull();
       assertThat(correlationRequiredProperty.getType()).isEqualTo("Dropdown");
@@ -282,7 +282,7 @@ public class InboundClassBasedTemplateGeneratorTest extends BaseTest {
         new GeneratorConfiguration(ConnectorMode.NORMAL, null, null, null, Set.of(type), Map.of());
 
     // when
-    var template = generator.generate(MyConnectorExecutable.class, config).getFirst();
+    var template = generator.generate(MyConnectorExecutable.class, config).get(0);
 
     var property = getPropertyByLabel("Prop 1", template);
 
@@ -308,7 +308,7 @@ public class InboundClassBasedTemplateGeneratorTest extends BaseTest {
               ConnectorMode.NORMAL, null, null, null, Set.of(type), Map.of());
 
       // when
-      var template = generator.generate(MyConnectorExecutable.class, config).getFirst();
+      var template = generator.generate(MyConnectorExecutable.class, config).get(0);
 
       // then
       assertThrows(Exception.class, () -> assertDeduplicationProperties(template));
@@ -330,7 +330,7 @@ public class InboundClassBasedTemplateGeneratorTest extends BaseTest {
               Map.of(GenerationFeature.INBOUND_DEDUPLICATION, true));
 
       // when
-      var template = generator.generate(MyConnectorExecutable.class, config).getFirst();
+      var template = generator.generate(MyConnectorExecutable.class, config).get(0);
 
       // then
       assertDeduplicationProperties(template);
@@ -352,7 +352,7 @@ public class InboundClassBasedTemplateGeneratorTest extends BaseTest {
               Map.of(GenerationFeature.INBOUND_DEDUPLICATION, false));
 
       // when
-      var template = generator.generate(MyConnectorExecutable.class, config).getFirst();
+      var template = generator.generate(MyConnectorExecutable.class, config).get(0);
 
       // then
       assertThrows(Exception.class, () -> assertDeduplicationProperties(template));

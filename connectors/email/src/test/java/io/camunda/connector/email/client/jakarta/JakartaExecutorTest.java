@@ -430,7 +430,7 @@ class JakartaExecutorTest {
     Object object = actionExecutor.execute(outboundConnectorContext);
 
     Assertions.assertInstanceOf(List.class, object);
-    Assertions.assertInstanceOf(ListEmailsResponse.class, ((List) object).getFirst());
+    Assertions.assertInstanceOf(ListEmailsResponse.class, ((List) object).get(0));
   }
 
   @Test
@@ -490,7 +490,7 @@ class JakartaExecutorTest {
     Object object = actionExecutor.execute(outboundConnectorContext);
 
     Assertions.assertInstanceOf(List.class, object);
-    Assertions.assertInstanceOf(ListEmailsResponse.class, ((List) object).getFirst());
+    Assertions.assertInstanceOf(ListEmailsResponse.class, ((List) object).get(0));
   }
 
   @Test
@@ -931,7 +931,7 @@ class JakartaExecutorTest {
         (List<SearchEmailsResponse>) actionExecutor.execute(outboundConnectorContext);
 
     Assertions.assertEquals(1, searchEmailsResponses.size());
-    Assertions.assertEquals("important", searchEmailsResponses.getFirst().subject());
+    Assertions.assertEquals("important", searchEmailsResponses.get(0).subject());
   }
 
   @Test

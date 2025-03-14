@@ -53,7 +53,7 @@ class CreateChatTest extends BaseTest {
     assertThat(chatArgumentCaptorValue.getTopic()).isEqualTo("myTopic");
     List<ConversationMember> members = chatArgumentCaptorValue.getMembers();
 
-    assertThat(members.getFirst().getAdditionalData().get(Member.USER_DATA_BIND))
+    assertThat(members.get(0).getAdditionalData().get(Member.USER_DATA_BIND))
         .isEqualTo(Member.toAdditionalDataValue(ActualValue.Channel.OWNER));
   }
 

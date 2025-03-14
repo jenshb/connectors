@@ -141,7 +141,7 @@ public class AwsSnsTest extends BaseAwsTest {
     List<Message> messages = AwsTestHelper.receiveMessages(sqsClient, sqsQueueUrl);
     assertFalse(messages.isEmpty(), "The SQS queue should have received a message");
     ObjectMapper objectMapper = new ObjectMapper();
-    JsonNode jsonNode = objectMapper.readTree(messages.getFirst().getBody());
+    JsonNode jsonNode = objectMapper.readTree(messages.get(0).getBody());
     String actualMessageContent = jsonNode.get("Message").asText();
     assertEquals(
         EXPECTED_SNS_MESSAGE,
@@ -201,15 +201,15 @@ public class AwsSnsTest extends BaseAwsTest {
     List<Message> messages = AwsTestHelper.receiveMessages(sqsClient, sqsFifoQueueUrl);
     assertFalse(messages.isEmpty(), "The SQS queue should have received a message");
     ObjectMapper objectMapper = new ObjectMapper();
-    JsonNode jsonNode = objectMapper.readTree(messages.getFirst().getBody());
+    JsonNode jsonNode = objectMapper.readTree(messages.get(0).getBody());
     String actualMessageContent = jsonNode.get("Message").asText();
     assertEquals(
         EXPECTED_SNS_MESSAGE,
         actualMessageContent,
         "The received message content does not match the expected content");
-    String messageGroupId = messages.getFirst().getAttributes().get("MessageGroupId");
+    String messageGroupId = messages.get(0).getAttributes().get("MessageGroupId");
     String messageDeduplicationId =
-        messages.getFirst().getAttributes().get("MessageDeduplicationId");
+        messages.get(0).getAttributes().get("MessageDeduplicationId");
     assertEquals(MESSAGE_GROUP_ID, messageGroupId);
     assertEquals(MESSAGE_DEDUPLICATION_ID, messageDeduplicationId);
   }

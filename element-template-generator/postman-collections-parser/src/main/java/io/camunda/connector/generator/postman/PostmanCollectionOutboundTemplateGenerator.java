@@ -84,7 +84,7 @@ public class PostmanCollectionOutboundTemplateGenerator
     if (templates.isEmpty()) {
       throw new RuntimeException("Scan did not return any template");
     }
-    var firstTemplate = templates.getFirst();
+    var firstTemplate = templates.get(0);
 
     var supportedOperations = extractSupportedOperations(input);
 

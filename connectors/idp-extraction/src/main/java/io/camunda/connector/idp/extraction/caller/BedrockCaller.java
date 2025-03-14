@@ -61,6 +61,6 @@ public class BedrockCaller {
                               .topP(converseData.topP()));
             });
 
-    return response.output().message().content().getFirst().text();
+    return response.output().message().content().get(0).text();
   }
 }

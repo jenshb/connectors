@@ -79,7 +79,7 @@ class BedrockContentMapperTest {
     List<BedrockContent> result = bedrockContentMapper.mapToBedrockContent(List.of(contentBlock));
 
     assertThat(result).hasSize(1);
-    assertThat(result.getFirst().getText()).isEqualTo(msg);
+    assertThat(result.get(0).getText()).isEqualTo(msg);
   }
 
   @Test

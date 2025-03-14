@@ -56,7 +56,7 @@ public class MeteredInboundCorrelationHandler extends InboundCorrelationHandler 
     if (elementList.isEmpty()) {
       throw new IllegalArgumentException("No elements to correlate, potential API misuse");
     }
-    var type = elementList.getFirst().type();
+    var type = elementList.get(0).type();
     metricsRecorder.increase(Inbound.METRIC_NAME_TRIGGERS, Inbound.ACTION_TRIGGERED, type);
 
     try {

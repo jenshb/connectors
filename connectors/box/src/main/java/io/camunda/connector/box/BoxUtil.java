@@ -50,7 +50,7 @@ public class BoxUtil {
   }
 
   public static Optional<BoxItem.Info> findItemInTree(BoxFolder folder, BoxPath.Segments segments) {
-    String segment = segments.segments().getFirst();
+    String segment = segments.segments().get(0);
     return findItemByName(items(folder), segment)
         .flatMap(
             item ->
