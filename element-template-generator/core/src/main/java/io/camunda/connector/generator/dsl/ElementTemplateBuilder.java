@@ -81,7 +81,7 @@ public class ElementTemplateBuilder {
     switch (mode) {
       case INBOUND:
         if (configurable) {
-          groups.addFirst(
+          groups.add(
               PropertyGroup.builder().id("connectorType").label("Connector type").build());
           property =
               StringProperty.builder()
@@ -97,7 +97,7 @@ public class ElementTemplateBuilder {
         break;
       case OUTBOUND:
         if (configurable) {
-          groups.addFirst(
+          groups.add(
               PropertyGroup.builder()
                   .id("taskDefinitionType")
                   .label("Task definition type")
