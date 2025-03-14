@@ -72,34 +72,26 @@ public class OutboundClassBasedTemplateGeneratorTest extends BaseTest {
     @Test
     void elementType_default_isServiceTask() {
       assertThat(
-              generator
-                  .generate(MyConnectorFunction.MinimallyAnnotated.class)
-                  .get(0)
-                  .elementType())
+              generator.generate(MyConnectorFunction.MinimallyAnnotated.class).get(0).elementType())
           .isEqualTo(ElementTypeWrapper.from(BpmnType.SERVICE_TASK));
     }
 
     @Test
     void elementType_customizable() {
-      assertThat(
-              generator.generate(MyConnectorFunction.FullyAnnotated.class).get(0).elementType())
+      assertThat(generator.generate(MyConnectorFunction.FullyAnnotated.class).get(0).elementType())
           .isEqualTo(ElementTypeWrapper.from(BpmnType.SCRIPT_TASK));
     }
 
     @Test
     void appliesTo_default_isTask() {
       assertThat(
-              generator
-                  .generate(MyConnectorFunction.MinimallyAnnotated.class)
-                  .get(0)
-                  .appliesTo())
+              generator.generate(MyConnectorFunction.MinimallyAnnotated.class).get(0).appliesTo())
           .isEqualTo(Set.of(BpmnType.TASK.getName()));
     }
 
     @Test
     void appliesTo_customizable() {
-      assertThat(
-              generator.generate(MyConnectorFunction.FullyAnnotated.class).get(0).appliesTo())
+      assertThat(generator.generate(MyConnectorFunction.FullyAnnotated.class).get(0).appliesTo())
           .isEqualTo(Set.of(BpmnType.SERVICE_TASK.getName()));
     }
 

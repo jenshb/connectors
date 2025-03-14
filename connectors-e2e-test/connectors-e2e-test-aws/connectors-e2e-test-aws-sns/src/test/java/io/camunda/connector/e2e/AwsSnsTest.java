@@ -208,8 +208,7 @@ public class AwsSnsTest extends BaseAwsTest {
         actualMessageContent,
         "The received message content does not match the expected content");
     String messageGroupId = messages.get(0).getAttributes().get("MessageGroupId");
-    String messageDeduplicationId =
-        messages.get(0).getAttributes().get("MessageDeduplicationId");
+    String messageDeduplicationId = messages.get(0).getAttributes().get("MessageDeduplicationId");
     assertEquals(MESSAGE_GROUP_ID, messageGroupId);
     assertEquals(MESSAGE_DEDUPLICATION_ID, messageDeduplicationId);
   }

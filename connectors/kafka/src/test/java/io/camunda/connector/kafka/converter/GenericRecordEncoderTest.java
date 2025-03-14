@@ -41,8 +41,7 @@ public class GenericRecordEncoderTest {
     record.put("age", 30);
     record.put("emails", List.of("test@camunda.com"));
     record.put("nickname", "JD");
-    GenericRecord boss =
-        new GenericData.Record(schema.getField("boss").schema().getTypes().get(0));
+    GenericRecord boss = new GenericData.Record(schema.getField("boss").schema().getTypes().get(0));
     boss.put("name", "Jane Doe");
     boss.put("position", "CEO");
     record.put("boss", boss);

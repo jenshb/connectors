@@ -65,8 +65,7 @@ public class InboundConnectorDetailsTest {
             new ProcessElement("myProcess", 0, 0, "element2", "<default>")));
 
     // when & then
-    var result =
-        InboundConnectorDetails.of(elements.get(0).deduplicationId(List.of()), elements);
+    var result = InboundConnectorDetails.of(elements.get(0).deduplicationId(List.of()), elements);
     assertThat(result).isInstanceOf(InboundConnectorDetails.InvalidInboundConnectorDetails.class);
     var invalid = (InboundConnectorDetails.InvalidInboundConnectorDetails) result;
     assertThat(invalid.error()).isInstanceOf(IllegalArgumentException.class);
@@ -96,8 +95,7 @@ public class InboundConnectorDetailsTest {
             new ProcessElement("myProcess", 0, 0, "element2", "tenant2")));
 
     // when & then
-    var result =
-        InboundConnectorDetails.of(elements.get(0).deduplicationId(List.of()), elements);
+    var result = InboundConnectorDetails.of(elements.get(0).deduplicationId(List.of()), elements);
     assertThat(result).isInstanceOf(InboundConnectorDetails.InvalidInboundConnectorDetails.class);
     var invalid = (InboundConnectorDetails.InvalidInboundConnectorDetails) result;
     assertThat(invalid.error()).isInstanceOf(IllegalArgumentException.class);
@@ -130,8 +128,7 @@ public class InboundConnectorDetailsTest {
             new ProcessElement("myProcess", 0, 0, "element2", "tenant")));
 
     // when & then
-    var result =
-        InboundConnectorDetails.of(elements.get(0).deduplicationId(List.of()), elements);
+    var result = InboundConnectorDetails.of(elements.get(0).deduplicationId(List.of()), elements);
     assertThat(result).isInstanceOf(InboundConnectorDetails.InvalidInboundConnectorDetails.class);
     var invalid = (InboundConnectorDetails.InvalidInboundConnectorDetails) result;
     assertThat(invalid.error()).isInstanceOf(IllegalArgumentException.class);

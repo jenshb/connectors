@@ -71,8 +71,7 @@ public class Generate implements Callable<Integer> {
     try {
       String resultString;
       if (templates.size() == 1) {
-        resultString =
-            mapper.writerWithDefaultPrettyPrinter().writeValueAsString(templates.get(0));
+        resultString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(templates.get(0));
       } else {
         resultString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(templates);
       }
