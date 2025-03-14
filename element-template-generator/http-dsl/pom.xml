@@ -14,11 +14,6 @@
   <artifactId>element-template-generator-http-dsl</artifactId>
   <packaging>jar</packaging>
 
-  <properties>
-    <maven.compiler.source>${version.java.template-generator}</maven.compiler.source>
-    <maven.compiler.target>${version.java.template-generator}</maven.compiler.target>
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>io.camunda.connector</groupId>
@@ -55,18 +50,4 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>${version.java.template-generator}</source>
-          <target>${version.java.template-generator}</target>
-          <release>${version.java.template-generator}</release>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>

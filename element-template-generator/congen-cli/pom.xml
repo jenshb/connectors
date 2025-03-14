@@ -17,8 +17,6 @@
 
   <properties>
     <version.picocli>4.7.6</version.picocli>
-    <maven.compiler.source>${version.java.template-generator}</maven.compiler.source>
-    <maven.compiler.target>${version.java.template-generator}</maven.compiler.target>
   </properties>
 
   <dependencies>
@@ -60,9 +58,6 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <!-- annotationProcessorPaths requires maven-compiler-plugin version 3.5 or higher -->
         <configuration>
-          <source>${version.java.template-generator}</source>
-          <target>${version.java.template-generator}</target>
-          <release>${version.java.template-generator}</release>
           <annotationProcessorPaths>
             <path>
               <groupId>info.picocli</groupId>
