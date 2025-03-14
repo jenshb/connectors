@@ -80,33 +80,39 @@ public class InboundCorrelationHandler {
           "Failed to evaluate activation condition against the provided input", e);
     }
 
-    return switch (activationCheckResult) {
-      case ActivationCheckResult.Failure.NoMatchingElement noMatchingElement ->
-          new ActivationConditionNotMet(noMatchingElement.discardUnmatchedEvents());
-      case ActivationCheckResult.Failure.TooManyMatchingElements ignored ->
-          new Failure.InvalidInput("Multiple connectors are activated for the same input", null);
-      case ActivationCheckResult.Success.CanActivate canActivate ->
-          correlateInternal(
-              findMatchingElement(elements, canActivate.activatedElement()), variables, messageId);
-    };
+    if (activationCheckResult
+        instanceof ActivationCheckResult.Failure.NoMatchingElement noMatchingElement) {
+      return new ActivationConditionNotMet(noMatchingElement.discardUnmatchedEvents());
+    }
+    if (activationCheckResult instanceof ActivationCheckResult.Failure.TooManyMatchingElements) {
+      return new Failure.InvalidInput("Multiple connectors are activated for the same input", null);
+    }
+    if (activationCheckResult instanceof ActivationCheckResult.Success.CanActivate canActivate) {
+      return correlateInternal(
+          findMatchingElement(elements, canActivate.activatedElement()), variables, messageId);
+    }
+    LOG.error("Unexpected activation check result: {}", activationCheckResult);
+    return new Failure.InvalidInput("Unexpected activation check result", null);
   }
 
   protected CorrelationResult correlateInternal(
       InboundConnectorElement activatedElement, Object variables, String messageId) {
     var correlationPoint = activatedElement.correlationPoint();
 
-    return switch (correlationPoint) {
-      case StartEventCorrelationPoint corPoint ->
-          triggerStartEvent(activatedElement, corPoint, variables);
-      case MessageCorrelationPoint corPoint ->
-          triggerMessage(
-              activatedElement,
-              corPoint,
-              variables,
-              resolveMessageId(corPoint.messageIdExpression(), messageId, variables));
-      case MessageStartEventCorrelationPoint corPoint ->
-          triggerMessageStartEvent(activatedElement, corPoint, variables);
-    };
+    if (correlationPoint instanceof StartEventCorrelationPoint corPoint) {
+      return triggerStartEvent(activatedElement, corPoint, variables);
+    }
+    if (correlationPoint instanceof MessageCorrelationPoint corPoint) {
+      return triggerMessage(
+          activatedElement,
+          corPoint,
+          variables,
+          resolveMessageId(corPoint.messageIdExpression(), messageId, variables));
+    }
+    if (correlationPoint instanceof MessageStartEventCorrelationPoint corPoint) {
+      return triggerMessageStartEvent(activatedElement, corPoint, variables);
+    }
+    return new Failure.InvalidInput("Unsupported correlation point type", null);
   }
 
   protected CorrelationResult triggerStartEvent(

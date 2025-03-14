@@ -39,26 +39,28 @@ public class JakartaUtils {
   private static final String REGEX_PATH_SPLITTER = "[./]";
 
   public Session createSession(Configuration configuration) {
-    return Session.getInstance(
-        switch (configuration) {
-          case ImapConfig imap -> createProperties(imap);
-          case Pop3Config pop3 -> createProperties(pop3);
-          case SmtpConfig smtp -> createProperties(smtp);
-        });
+    if (configuration instanceof ImapConfig imap) {
+      return Session.getInstance(createProperties(imap));
+    }
+    if (configuration instanceof Pop3Config pop3) {
+      return Session.getInstance(createProperties(pop3));
+    }
+    if (configuration instanceof SmtpConfig smtp) {
+      return Session.getInstance(createProperties(smtp));
+    }
+    throw new RuntimeException("No configuration has been set");
   }
 
   public void connectStore(Store store, Authentication authentication) throws MessagingException {
-    switch (authentication) {
-      case SimpleAuthentication simpleAuthentication ->
-          store.connect(simpleAuthentication.username(), simpleAuthentication.password());
+    if (authentication instanceof SimpleAuthentication simpleAuthentication) {
+      store.connect(simpleAuthentication.username(), simpleAuthentication.password());
     }
   }
 
   public void connectTransport(Transport transport, Authentication authentication)
       throws MessagingException {
-    switch (authentication) {
-      case SimpleAuthentication simpleAuthentication ->
-          transport.connect(simpleAuthentication.username(), simpleAuthentication.password());
+    if (authentication instanceof SimpleAuthentication simpleAuthentication) {
+      transport.connect(simpleAuthentication.username(), simpleAuthentication.password());
     }
   }
 
@@ -242,15 +244,16 @@ public class JakartaUtils {
     try {
       Object bodyObject = message.getContent();
       Email email = this.createBodylessEmail(message);
-      EmailBody emailBody =
-          switch (bodyObject) {
-            case MimeMultipart multipart -> processMultipart(multipart, EmailBody.createBuilder());
-            case String bodyAsPlainText when message.isMimeType("text/plain") ->
-                EmailBody.createBuilder().withBodyAsPlainText(bodyAsPlainText).build();
-            case String bodyAsHtml when message.isMimeType("text/html") ->
-                EmailBody.createBuilder().withBodyAsHtml(bodyAsHtml).build();
-            default -> throw new IllegalStateException("Unexpected part: " + bodyObject);
-          };
+      EmailBody emailBody;
+      if (bodyObject instanceof MimeMultipart multipart) {
+        emailBody = processMultipart(multipart, EmailBody.createBuilder());
+      } else if (bodyObject instanceof String bodyAsPlainText && message.isMimeType("text/plain")) {
+        emailBody = EmailBody.createBuilder().withBodyAsPlainText(bodyAsPlainText).build();
+      } else if (bodyObject instanceof String bodyAsHtml && message.isMimeType("text/html")) {
+        emailBody = EmailBody.createBuilder().withBodyAsHtml(bodyAsHtml).build();
+      } else {
+        throw new IllegalStateException("Unexpected part: " + bodyObject);
+      }
       return new Email(
           emailBody,
           email.messageId(),
@@ -283,30 +286,25 @@ public class JakartaUtils {
       MimeMultipart multipart, EmailBody.EmailBodyBuilder emailBodyBuilder, int i)
       throws MessagingException, IOException {
     BodyPart bodyPart = multipart.getBodyPart(i);
-    switch (bodyPart.getContent()) {
-      case InputStream attachment when Part.ATTACHMENT.equalsIgnoreCase(
-              bodyPart.getDisposition()) ->
-          emailBodyBuilder.addAttachment(
-              new EmailAttachment(
-                  attachment,
-                  bodyPart.getFileName(),
-                  new ContentType(bodyPart.getContentType()).getBaseType()));
-      case String textAttachment when Part.ATTACHMENT.equalsIgnoreCase(bodyPart.getDisposition()) ->
-          emailBodyBuilder.addAttachment(
-              new EmailAttachment(
-                  new ByteArrayInputStream(textAttachment.getBytes()),
-                  bodyPart.getFileName(),
-                  new ContentType(bodyPart.getContentType()).getBaseType()));
-      case String plainText when bodyPart.isMimeType("text/plain") ->
-          emailBodyBuilder.withBodyAsPlainText(plainText);
-      case String html when bodyPart.isMimeType("text/html") ->
-          emailBodyBuilder.withBodyAsHtml(html);
-      case MimeMultipart nestedMultipart -> processMultipart(nestedMultipart, emailBodyBuilder);
-      default ->
-          LOGGER.warn(
-              "This part is not yet managed. Mime : {}, disposition: {}",
-              bodyPart.getContentType(),
-              bodyPart.getDisposition());
+    if (bodyPart.getContent() instanceof InputStream attachment
+        && Part.ATTACHMENT.equalsIgnoreCase(bodyPart.getDisposition())) {
+      emailBodyBuilder.addAttachment(
+          new EmailAttachment(
+              attachment,
+              bodyPart.getFileName(),
+              new ContentType(bodyPart.getContentType()).getBaseType()));
+    } else if (bodyPart.getContent() instanceof String textAttachment
+        && Part.ATTACHMENT.equalsIgnoreCase(bodyPart.getDisposition())) {
+      emailBodyBuilder.addAttachment(
+          new EmailAttachment(
+              new ByteArrayInputStream(textAttachment.getBytes()),
+              bodyPart.getFileName(),
+              new ContentType(bodyPart.getContentType()).getBaseType()));
+    } else {
+      LOGGER.warn(
+          "This part is not yet managed. Mime : {}, disposition: {}",
+          bodyPart.getContentType(),
+          bodyPart.getDisposition());
     }
   }
 

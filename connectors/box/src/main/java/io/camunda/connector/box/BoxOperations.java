@@ -33,35 +33,49 @@ public class BoxOperations {
 
   public static BoxResult execute(BoxRequest request, OutboundConnectorContext context) {
     var api = connectToApi(request.authentication());
-    return switch (request.operation()) {
-      case BoxRequest.Operation.UploadFile uploadFile -> uploadFile(uploadFile, api);
-      case BoxRequest.Operation.DownloadFile downloadFile ->
-          downloadFile(downloadFile, api, context);
-      case BoxRequest.Operation.MoveFile moveFile -> moveFile(moveFile, api);
-      case BoxRequest.Operation.DeleteFile deleteFile -> deleteFile(deleteFile, api);
-      case BoxRequest.Operation.CreateFolder createFolder -> createFolder(createFolder, api);
-      case BoxRequest.Operation.DeleteFolder deleteFolder -> deleteFolder(deleteFolder, api);
-      case BoxRequest.Operation.Search search -> search(search, api);
-    };
+
+    BoxRequest.Operation operation = request.operation();
+    if (operation instanceof BoxRequest.Operation.UploadFile) {
+      return uploadFile((BoxRequest.Operation.UploadFile) operation, api);
+    } else if (operation instanceof BoxRequest.Operation.DownloadFile) {
+      return downloadFile((BoxRequest.Operation.DownloadFile) operation, api, context);
+    } else if (operation instanceof BoxRequest.Operation.MoveFile) {
+      return moveFile((BoxRequest.Operation.MoveFile) operation, api);
+    } else if (operation instanceof BoxRequest.Operation.DeleteFile) {
+      return deleteFile((BoxRequest.Operation.DeleteFile) operation, api);
+    } else if (operation instanceof BoxRequest.Operation.CreateFolder) {
+      return createFolder((BoxRequest.Operation.CreateFolder) operation, api);
+    } else if (operation instanceof BoxRequest.Operation.DeleteFolder) {
+      return deleteFolder((BoxRequest.Operation.DeleteFolder) operation, api);
+    } else if (operation instanceof BoxRequest.Operation.Search) {
+      return search((BoxRequest.Operation.Search) operation, api);
+    } else {
+      throw new IllegalArgumentException("Unknown operation: " + operation);
+    }
   }
 
   private static BoxAPIConnection connectToApi(BoxRequest.Authentication authentication) {
-    return switch (authentication) {
-      case BoxRequest.Authentication.DeveloperToken developerToken ->
-          new BoxAPIConnection(developerToken.accessToken());
-
-      case BoxRequest.Authentication.ClientCredentialsUser user ->
-          BoxCCGAPIConnection.userConnection(user.clientId(), user.clientSecret(), user.userId());
-
-      case BoxRequest.Authentication.ClientCredentialsEnterprise enterprise ->
-          BoxCCGAPIConnection.applicationServiceAccountConnection(
-              enterprise.clientId(), enterprise.clientSecret(), enterprise.enterpriseId());
-
-      case BoxRequest.Authentication.JWTJsonConfig jwtJsonConfig -> {
-        BoxConfig boxConfig = BoxConfig.readFrom(jwtJsonConfig.jsonConfig());
-        yield BoxDeveloperEditionAPIConnection.getAppEnterpriseConnection(boxConfig);
-      }
-    };
+    if (authentication instanceof BoxRequest.Authentication.DeveloperToken) {
+      return new BoxAPIConnection(
+          ((BoxRequest.Authentication.DeveloperToken) authentication).accessToken());
+    } else if (authentication instanceof BoxRequest.Authentication.ClientCredentialsUser) {
+      BoxRequest.Authentication.ClientCredentialsUser user =
+          (BoxRequest.Authentication.ClientCredentialsUser) authentication;
+      return BoxCCGAPIConnection.userConnection(
+          user.clientId(), user.clientSecret(), user.userId());
+    } else if (authentication instanceof BoxRequest.Authentication.ClientCredentialsEnterprise) {
+      BoxRequest.Authentication.ClientCredentialsEnterprise enterprise =
+          (BoxRequest.Authentication.ClientCredentialsEnterprise) authentication;
+      return BoxCCGAPIConnection.applicationServiceAccountConnection(
+          enterprise.clientId(), enterprise.clientSecret(), enterprise.enterpriseId());
+    } else if (authentication instanceof BoxRequest.Authentication.JWTJsonConfig) {
+      BoxConfig boxConfig =
+          BoxConfig.readFrom(
+              ((BoxRequest.Authentication.JWTJsonConfig) authentication).jsonConfig());
+      return BoxDeveloperEditionAPIConnection.getAppEnterpriseConnection(boxConfig);
+    } else {
+      throw new IllegalArgumentException("Unknown authentication type: " + authentication);
+    }
   }
 
   private static BoxResult.Upload uploadFile(

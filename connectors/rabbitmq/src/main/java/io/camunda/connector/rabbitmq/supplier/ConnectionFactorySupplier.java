@@ -21,15 +21,17 @@ public class ConnectionFactorySupplier {
       final RabbitMqAuthentication authentication, final FactoryRoutingData routing)
       throws URISyntaxException, NoSuchAlgorithmException, KeyManagementException {
     final var factory = new ConnectionFactory();
-    switch (authentication) {
-      case UriAuthentication uriAuthentication -> factory.setUri(uriAuthentication.uri());
-      case CredentialsAuthentication credentialsAuthentication -> {
-        factory.setUsername(credentialsAuthentication.userName());
-        factory.setPassword(credentialsAuthentication.password());
-        factory.setVirtualHost(routing.virtualHost());
-        factory.setHost(routing.hostName());
-        factory.setPort(Integer.parseInt(routing.port()));
-      }
+    if (authentication instanceof UriAuthentication) {
+      UriAuthentication uriAuthentication = (UriAuthentication) authentication;
+      factory.setUri(uriAuthentication.uri());
+    } else if (authentication instanceof CredentialsAuthentication) {
+      CredentialsAuthentication credentialsAuthentication =
+          (CredentialsAuthentication) authentication;
+      factory.setUsername(credentialsAuthentication.userName());
+      factory.setPassword(credentialsAuthentication.password());
+      factory.setVirtualHost(routing.virtualHost());
+      factory.setHost(routing.hostName());
+      factory.setPort(Integer.parseInt(routing.port()));
     }
     return factory;
   }

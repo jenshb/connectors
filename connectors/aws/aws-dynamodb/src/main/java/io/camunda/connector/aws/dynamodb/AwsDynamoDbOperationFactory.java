@@ -35,18 +35,32 @@ public class AwsDynamoDbOperationFactory {
   }
 
   public AwsDynamoDbOperation createOperation(AwsInput input) {
-    return switch (input) {
-      case AddItem addItem -> new AddItemOperation(addItem);
-      case CreateTable createTable -> new CreateTableOperation(createTable);
-      case DeleteItem deleteItem -> new DeleteItemOperation(deleteItem);
-      case DeleteTable deleteTable -> new DeleteTableOperation(deleteTable);
-      case DescribeTable describeTable -> new DescribeTableOperation(describeTable);
-      case GetItem getItem -> new GetItemOperation(getItem);
-      case ScanTable scanTable -> new ScanTableOperation(scanTable);
-      case UpdateItem updateItem -> new UpdateItemOperation(updateItem);
-      default ->
-          throw new UnsupportedOperationException(
-              "Unsupported operation: [" + input.getClass().getSimpleName() + "]");
-    };
+
+    if (input instanceof AddItem addItem) {
+      return new AddItemOperation(addItem);
+    }
+    if (input instanceof CreateTable createTable) {
+      return new CreateTableOperation(createTable);
+    }
+    if (input instanceof DeleteItem deleteItem) {
+      return new DeleteItemOperation(deleteItem);
+    }
+    if (input instanceof DeleteTable deleteTable) {
+      return new DeleteTableOperation(deleteTable);
+    }
+    if (input instanceof DescribeTable describeTable) {
+      return new DescribeTableOperation(describeTable);
+    }
+    if (input instanceof GetItem getItem) {
+      return new GetItemOperation(getItem);
+    }
+    if (input instanceof ScanTable scanTable) {
+      return new ScanTableOperation(scanTable);
+    }
+    if (input instanceof UpdateItem updateItem) {
+      return new UpdateItemOperation(updateItem);
+    }
+    throw new UnsupportedOperationException(
+        "Unsupported operation: [" + input.getClass().getSimpleName() + "]");
   }
 }

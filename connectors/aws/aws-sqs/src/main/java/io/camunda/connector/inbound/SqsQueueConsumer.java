@@ -81,23 +81,16 @@ public class SqsQueueConsumer implements Runnable {
   }
 
   private void handleCorrelationResult(Message message, CorrelationResult result) {
-    switch (result) {
-      case Success ignored -> {
-        LOGGER.debug("ACK - message correlated successfully");
+    if (result instanceof Success) {
+      LOGGER.debug("ACK - message correlated successfully");
+      sqsClient.deleteMessage(properties.getQueue().url(), message.getReceiptHandle());
+    } else if (result instanceof Failure failure) {
+      context.log(Activity.level(Severity.WARNING).tag("Message").message(failure.message()));
+      if (failure.handlingStrategy() instanceof ForwardErrorToUpstream) {
+        LOGGER.debug("NACK (requeue) - message not correlated");
+      } else if (failure.handlingStrategy() instanceof Ignore) {
+        LOGGER.debug("ACK - message ignored");
         sqsClient.deleteMessage(properties.getQueue().url(), message.getReceiptHandle());
-      }
-
-      case Failure failure -> {
-        context.log(Activity.level(Severity.WARNING).tag("Message").message(failure.message()));
-        switch (failure.handlingStrategy()) {
-          case ForwardErrorToUpstream ignored1 -> {
-            LOGGER.debug("NACK (requeue) - message not correlated");
-          }
-          case Ignore ignored -> {
-            LOGGER.debug("ACK - message ignored");
-            sqsClient.deleteMessage(properties.getQueue().url(), message.getReceiptHandle());
-          }
-        }
       }
     }
   }

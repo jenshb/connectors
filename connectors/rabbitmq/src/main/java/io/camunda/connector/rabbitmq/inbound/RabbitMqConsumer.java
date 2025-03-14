@@ -71,36 +71,29 @@ public class RabbitMqConsumer extends DefaultConsumer {
   private void handleCorrelationResult(Envelope envelope, CorrelationResult result)
       throws IOException {
 
-    switch (result) {
-      case Success ignored -> {
-        LOGGER.debug("ACK - message correlated successfully");
-        getChannel().basicAck(envelope.getDeliveryTag(), false);
-      }
-
-      case Failure failure -> {
-        context.log(
-            Activity.level(Severity.WARNING)
-                .tag("Message")
-                .message(
-                    "Failed to handle AMQP message with delivery tag "
-                        + envelope.getDeliveryTag()
-                        + ", reason: "
-                        + failure.message()));
-        switch (failure.handlingStrategy()) {
-          case ForwardErrorToUpstream fwdStrategy -> {
-            if (fwdStrategy.isRetryable()) {
-              LOGGER.debug("NACK (requeue) - message not correlated");
-              getChannel().basicReject(envelope.getDeliveryTag(), true);
-            } else {
-              LOGGER.debug("NACK (drop) - message not correlated");
-              getChannel().basicReject(envelope.getDeliveryTag(), false);
-            }
-          }
-          case Ignore ignored -> {
-            LOGGER.debug("ACK - message ignored");
-            getChannel().basicAck(envelope.getDeliveryTag(), false);
-          }
+    if (result instanceof Success) {
+      LOGGER.debug("ACK - message correlated successfully");
+      getChannel().basicAck(envelope.getDeliveryTag(), false);
+    } else if (result instanceof Failure failure) {
+      context.log(
+          Activity.level(Severity.WARNING)
+              .tag("Message")
+              .message(
+                  "Failed to handle AMQP message with delivery tag "
+                      + envelope.getDeliveryTag()
+                      + ", reason: "
+                      + failure.message()));
+      if (failure.handlingStrategy() instanceof ForwardErrorToUpstream fwdStrategy) {
+        if (fwdStrategy.isRetryable()) {
+          LOGGER.debug("NACK (requeue) - message not correlated");
+          getChannel().basicReject(envelope.getDeliveryTag(), true);
+        } else {
+          LOGGER.debug("NACK (drop) - message not correlated");
+          getChannel().basicReject(envelope.getDeliveryTag(), false);
         }
+      } else if (failure.handlingStrategy() instanceof Ignore) {
+        LOGGER.debug("ACK - message ignored");
+        getChannel().basicAck(envelope.getDeliveryTag(), false);
       }
     }
   }

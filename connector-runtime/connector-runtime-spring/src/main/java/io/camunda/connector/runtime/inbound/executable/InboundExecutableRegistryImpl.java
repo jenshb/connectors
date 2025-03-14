@@ -87,10 +87,14 @@ public class InboundExecutableRegistryImpl implements InboundExecutableRegistry 
   }
 
   void handleEvent(InboundExecutableEvent event) {
-    switch (event) {
-      case InboundExecutableEvent.Activated activated -> handleActivated(activated);
-      case Deactivated deactivated -> handleDeactivated(deactivated);
-      case InboundExecutableEvent.Cancelled cancelled -> handleCancelled(cancelled);
+    if (event instanceof InboundExecutableEvent.Activated activated) {
+      handleActivated(activated);
+    }
+    if (event instanceof Deactivated deactivated) {
+      handleDeactivated(deactivated);
+    }
+    if (event instanceof InboundExecutableEvent.Cancelled cancelled) {
+      handleCancelled(cancelled);
     }
   }
 
@@ -227,37 +231,39 @@ public class InboundExecutableRegistryImpl implements InboundExecutableRegistry 
   }
 
   private boolean matchesQuery(RegisteredExecutable executable, ActiveExecutableQuery query) {
-    List<ProcessElement> elements =
-        switch (executable) {
-          case Activated activated ->
-              activated.context().connectorElements().stream()
-                  .map(InboundConnectorElement::element)
-                  .toList();
-          case FailedToActivate failed ->
-              failed.data().connectorElements().stream()
-                  .map(InboundConnectorElement::element)
-                  .toList();
-          case ConnectorNotRegistered notRegistered ->
-              notRegistered.data().connectorElements().stream()
-                  .map(InboundConnectorElement::element)
-                  .toList();
-          case InvalidDefinition invalid ->
-              invalid.data().connectorElements().stream()
-                  .map(InboundConnectorElement::element)
-                  .toList();
-          case Cancelled cancelled ->
-              cancelled.context().connectorElements().stream()
-                  .map(InboundConnectorElement::element)
-                  .toList();
-        };
-    var type =
-        switch (executable) {
-          case Activated activated -> activated.context().getDefinition().type();
-          case FailedToActivate failed -> failed.data().connectorElements().getFirst().type();
-          case ConnectorNotRegistered notRegistered -> notRegistered.data().type();
-          case InvalidDefinition invalid -> invalid.data().connectorElements().getFirst().type();
-          case Cancelled cancelled -> cancelled.context().getDefinition().type();
-        };
+    List<ProcessElement> elements;
+    String type;
+    if (executable instanceof Activated activated) {
+      elements =
+          activated.context().connectorElements().stream()
+              .map(InboundConnectorElement::element)
+              .toList();
+      type = activated.context().getDefinition().type();
+    } else if (executable instanceof FailedToActivate failed) {
+      elements =
+          failed.data().connectorElements().stream().map(InboundConnectorElement::element).toList();
+      type = failed.data().connectorElements().getFirst().type();
+    } else if (executable instanceof ConnectorNotRegistered notRegistered) {
+      elements =
+          notRegistered.data().connectorElements().stream()
+              .map(InboundConnectorElement::element)
+              .toList();
+      type = notRegistered.data().type();
+    } else if (executable instanceof InvalidDefinition invalid) {
+      elements =
+          invalid.data().connectorElements().stream()
+              .map(InboundConnectorElement::element)
+              .toList();
+      type = invalid.data().connectorElements().getFirst().type();
+    } else if (executable instanceof Cancelled cancelled) {
+      elements =
+          cancelled.context().connectorElements().stream()
+              .map(InboundConnectorElement::element)
+              .toList();
+      type = cancelled.context().getDefinition().type();
+    } else {
+      throw new IllegalStateException("Unexpected value: " + executable);
+    }
 
     return elements.stream()
         .anyMatch(
@@ -286,53 +292,53 @@ public class InboundExecutableRegistryImpl implements InboundExecutableRegistry 
 
   private ActiveExecutableResponse mapToResponse(UUID id, RegisteredExecutable connector) {
 
-    return switch (connector) {
-      case Activated activated ->
-          new ActiveExecutableResponse(
-              id,
-              activated.executable().getClass(),
-              activated.context().connectorElements(),
-              activated.context().getHealth(),
-              activated.context().getLogs(),
-              activated.context().getActivationTimestamp());
-      case FailedToActivate failed ->
-          new ActiveExecutableResponse(
-              id,
-              null,
-              failed.data().connectorElements(),
-              Health.down(new Error("Activation failure", failed.reason())),
-              List.of(),
-              null);
-      case ConnectorNotRegistered notRegistered ->
-          new ActiveExecutableResponse(
-              id,
-              null,
-              notRegistered.data().connectorElements(),
-              Health.down(
-                  new Error(
-                      "Activation failure",
-                      "Connector " + notRegistered.data().type() + " not registered")),
-              List.of(),
-              null);
-      case InvalidDefinition invalid ->
-          new ActiveExecutableResponse(
-              id,
-              null,
-              invalid.data().connectorElements(),
-              Health.down(
-                  new Error(
-                      "Activation failure", "Invalid connector definition: " + invalid.reason())),
-              List.of(),
-              null);
-      case Cancelled cancelled ->
-          new ActiveExecutableResponse(
-              id,
-              cancelled.executable().getClass(),
-              cancelled.context().connectorElements(),
-              Health.down(cancelled.exceptionThrown()),
-              cancelled.context().getLogs(),
-              null);
-    };
+    if (connector instanceof Activated activated) {
+      return new ActiveExecutableResponse(
+          id,
+          activated.executable().getClass(),
+          activated.context().connectorElements(),
+          activated.context().getHealth(),
+          activated.context().getLogs(),
+          activated.context().getActivationTimestamp());
+    } else if (connector instanceof FailedToActivate failed) {
+      return new ActiveExecutableResponse(
+          id,
+          null,
+          failed.data().connectorElements(),
+          Health.down(new Error("Activation failure", failed.reason())),
+          List.of(),
+          null);
+    } else if (connector instanceof ConnectorNotRegistered notRegistered) {
+      return new ActiveExecutableResponse(
+          id,
+          null,
+          notRegistered.data().connectorElements(),
+          Health.down(
+              new Error(
+                  "Activation failure",
+                  "Connector " + notRegistered.data().type() + " not registered")),
+          List.of(),
+          null);
+    } else if (connector instanceof InvalidDefinition invalid) {
+      return new ActiveExecutableResponse(
+          id,
+          null,
+          invalid.data().connectorElements(),
+          Health.down(
+              new Error("Activation failure", "Invalid connector definition: " + invalid.reason())),
+          List.of(),
+          null);
+    } else if (connector instanceof Cancelled cancelled) {
+      return new ActiveExecutableResponse(
+          id,
+          cancelled.executable().getClass(),
+          cancelled.context().connectorElements(),
+          Health.down(cancelled.exceptionThrown()),
+          cancelled.context().getLogs(),
+          null);
+    } else {
+      throw new IllegalStateException("Unexpected value: " + connector);
+    }
   }
 
   // print status report every hour
@@ -342,15 +348,21 @@ public class InboundExecutableRegistryImpl implements InboundExecutableRegistry 
     executables.values().stream()
         .collect(
             Collectors.groupingBy(
-                activeExecutable ->
-                    switch (activeExecutable) {
-                      case Activated activated -> activated.context().getDefinition().type();
-                      case FailedToActivate failed ->
-                          failed.data().connectorElements().getFirst().type();
-                      case ConnectorNotRegistered notRegistered -> notRegistered.data().type();
-                      case InvalidDefinition invalid -> invalid.data().type();
-                      case Cancelled cancelled -> cancelled.context().getDefinition().type();
-                    },
+                activeExecutable -> {
+                  if (activeExecutable instanceof Activated activated) {
+                    return activated.context().getDefinition().type();
+                  } else if (activeExecutable instanceof FailedToActivate failed) {
+                    return failed.data().connectorElements().getFirst().type();
+                  } else if (activeExecutable instanceof ConnectorNotRegistered notRegistered) {
+                    return notRegistered.data().type();
+                  } else if (activeExecutable instanceof InvalidDefinition invalid) {
+                    return invalid.data().type();
+                  } else if (activeExecutable instanceof Cancelled cancelled) {
+                    return cancelled.context().getDefinition().type();
+                  } else {
+                    throw new IllegalStateException("Unexpected value: " + activeExecutable);
+                  }
+                },
                 Collectors.toList()))
         .forEach(
             (type, list) -> {
@@ -365,17 +377,23 @@ public class InboundExecutableRegistryImpl implements InboundExecutableRegistry 
                   list.stream()
                       .collect(
                           Collectors.groupingBy(
-                              activeExecutable ->
-                                  switch (activeExecutable) {
-                                    case Activated activated ->
-                                        activated.context().getDefinition().tenantId();
-                                    case FailedToActivate failed -> failed.data().tenantId();
-                                    case ConnectorNotRegistered notRegistered ->
-                                        notRegistered.data().tenantId();
-                                    case InvalidDefinition invalid -> invalid.data().tenantId();
-                                    case Cancelled cancelled ->
-                                        cancelled.context().getDefinition().tenantId();
-                                  },
+                              activeExecutable -> {
+                                if (activeExecutable instanceof Activated activated) {
+                                  return activated.context().getDefinition().tenantId();
+                                } else if (activeExecutable instanceof FailedToActivate failed) {
+                                  return failed.data().tenantId();
+                                } else if (activeExecutable
+                                    instanceof ConnectorNotRegistered notRegistered) {
+                                  return notRegistered.data().tenantId();
+                                } else if (activeExecutable instanceof InvalidDefinition invalid) {
+                                  return invalid.data().tenantId();
+                                } else if (activeExecutable instanceof Cancelled cancelled) {
+                                  return cancelled.context().getDefinition().tenantId();
+                                } else {
+                                  throw new IllegalStateException(
+                                      "Unexpected value: " + activeExecutable);
+                                }
+                              },
                               Collectors.counting()));
               groupedByTenant.forEach(
                   (tenant, count) -> LOG.info(". . {} for tenant {}", count, tenant));

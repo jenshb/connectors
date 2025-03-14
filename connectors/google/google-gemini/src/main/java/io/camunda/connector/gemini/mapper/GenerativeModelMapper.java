@@ -102,8 +102,10 @@ public class GenerativeModelMapper {
   }
 
   private SafetySetting.HarmBlockThreshold mapHarmBlock(BlockingDegree blockingDegree) {
+    if (blockingDegree == null) {
+      return SafetySetting.HarmBlockThreshold.OFF;
+    }
     return switch (blockingDegree) {
-      case null -> SafetySetting.HarmBlockThreshold.OFF;
       case OFF -> SafetySetting.HarmBlockThreshold.OFF;
       case BLOCK_ONLY_HIGH -> SafetySetting.HarmBlockThreshold.BLOCK_ONLY_HIGH;
       case BLOCK_MEDIUM_AND_ABOVE -> SafetySetting.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE;

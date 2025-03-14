@@ -127,15 +127,14 @@ public class ApacheRequestBodyBuilder implements ApacheRequestPartBuilder {
     builder.setMode(HttpMultipartMode.LEGACY);
     Optional.ofNullable(contentType.getParameter("boundary")).ifPresent(builder::setBoundary);
     for (Map.Entry<?, ?> entry : body.entrySet()) {
-      switch (entry.getValue()) {
-        case Document document -> streamDocumentContent(entry, document, builder);
-        case List<?> list -> tryStreamDocumentListContent(entry, list, builder);
-        case null -> {}
-        default ->
-            builder.addTextBody(
-                String.valueOf(entry.getKey()),
-                String.valueOf(entry.getValue()),
-                MULTIPART_FORM_DATA);
+
+      if (entry.getValue() instanceof Document document) {
+        streamDocumentContent(entry, document, builder);
+      } else if (entry.getValue() instanceof List<?> list) {
+        tryStreamDocumentListContent(entry, list, builder);
+      } else {
+        builder.addTextBody(
+            String.valueOf(entry.getKey()), String.valueOf(entry.getValue()), MULTIPART_FORM_DATA);
       }
     }
     return builder.build();

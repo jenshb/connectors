@@ -40,24 +40,39 @@ import io.camunda.connector.operation.chat.SendMessageInChatChatOperation;
 
 public class OperationFactory {
   public Operation getService(final MSTeamsRequestData data) {
-    return switch (data) {
-        // chat
-      case CreateChat model -> new CreateChatOperation(model);
-      case GetChat model -> new GetChatOperation(model);
-      case GetMessageInChat model -> new GetMessageInChatOperation(model);
-      case ListChatMembers model -> new ListChatMembersChatOperation(model);
-      case ListChats model -> new ListChatsOperation(model);
-      case ListMessagesInChat model -> new ListMessagesInChatOperation(model);
-      case SendMessageInChat model -> new SendMessageInChatChatOperation(model);
-        // channel
-      case CreateChannel model -> new CreateChannelOperation(model);
-      case GetChannel model -> new GetChannelOperation(model);
-      case GetChannelMessage model -> new GetChannelMessageOperation(model);
-      case ListChannelMembers model -> new ListChannelMembersOperation(model);
-      case ListChannelMessages model -> new ListChannelMessagesOperation(model);
-      case ListChannels model -> new ListChannelsOperation(model);
-      case ListMessageRepliesInChannel model -> new ListMessageRepliesInChannelOperation(model);
-      case SendMessageToChannel model -> new SendMessageToChannelOperation(model);
-    };
+    if (data instanceof CreateChat) {
+      return new CreateChatOperation((CreateChat) data);
+    } else if (data instanceof GetChat) {
+      return new GetChatOperation((GetChat) data);
+    } else if (data instanceof GetMessageInChat) {
+      return new GetMessageInChatOperation((GetMessageInChat) data);
+    } else if (data instanceof ListChatMembers) {
+      return new ListChatMembersChatOperation((ListChatMembers) data);
+    } else if (data instanceof ListChats) {
+      return new ListChatsOperation((ListChats) data);
+    } else if (data instanceof ListMessagesInChat) {
+      return new ListMessagesInChatOperation((ListMessagesInChat) data);
+    } else if (data instanceof SendMessageInChat) {
+      return new SendMessageInChatChatOperation((SendMessageInChat) data);
+    } else if (data instanceof CreateChannel) {
+      return new CreateChannelOperation((CreateChannel) data);
+    } else if (data instanceof GetChannel) {
+      return new GetChannelOperation((GetChannel) data);
+    } else if (data instanceof GetChannelMessage) {
+      return new GetChannelMessageOperation((GetChannelMessage) data);
+    } else if (data instanceof ListChannelMembers) {
+      return new ListChannelMembersOperation((ListChannelMembers) data);
+    } else if (data instanceof ListChannelMessages) {
+      return new ListChannelMessagesOperation((ListChannelMessages) data);
+    } else if (data instanceof ListChannels) {
+      return new ListChannelsOperation((ListChannels) data);
+    } else if (data instanceof ListMessageRepliesInChannel) {
+      return new ListMessageRepliesInChannelOperation((ListMessageRepliesInChannel) data);
+    } else if (data instanceof SendMessageToChannel) {
+      return new SendMessageToChannelOperation((SendMessageToChannel) data);
+    } else {
+      throw new IllegalArgumentException(
+          "Unknown MSTeamsRequestData type: " + data.getClass().getName());
+    }
   }
 }

@@ -158,14 +158,17 @@ class InboundInstancesRestControllerTest {
                                   invocationOnMock
                                       .getArgument(0, ActiveExecutableQuery.class)
                                       .type();
-                              return switch (providedType) {
-                                case null -> true;
-                                case TYPE_1 -> response.executableId().equals(UUID_1);
-                                case TYPE_2 ->
-                                    response.executableId().equals(UUID_2)
-                                        || response.executableId().equals(UUID_3);
-                                default -> false;
-                              };
+                              if (providedType == null) {
+                                return true;
+                              }
+                              if (providedType.equals(TYPE_1)) {
+                                return response.executableId().equals(UUID_1);
+                              }
+                              if (providedType.equals(TYPE_2)) {
+                                return response.executableId().equals(UUID_2)
+                                    || response.executableId().equals(UUID_3);
+                              }
+                              return false;
                             })
                         .toList());
   }

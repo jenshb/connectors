@@ -88,10 +88,10 @@ public class InboundWebhookRestController {
   }
 
   protected static Object escapeValue(Object value) {
-    return switch (value) {
-      case String s -> HtmlUtils.htmlEscape(s);
-      case null, default -> value;
-    };
+    if (value instanceof String) {
+      return HtmlUtils.htmlEscape((String) value);
+    }
+    return value;
   }
 
   @RequestMapping(
@@ -186,9 +186,12 @@ public class InboundWebhookRestController {
       response = buildSuccessfulResponse(webhookResult, documents, success);
     } else {
       if (correlationResult instanceof CorrelationResult.Failure failure) {
-        switch (failure.handlingStrategy()) {
-          case ForwardErrorToUpstream ignored -> response = buildErrorResponse(failure);
-          case Ignore ignored -> response = buildSuccessfulResponse(webhookResult, documents, null);
+        if (failure.handlingStrategy() instanceof ForwardErrorToUpstream) {
+          response = buildErrorResponse(failure);
+        } else if (failure.handlingStrategy() instanceof Ignore) {
+          response = buildSuccessfulResponse(webhookResult, documents, null);
+        } else {
+          throw new IllegalStateException("Illegal correlation result : " + correlationResult);
         }
       } else {
         throw new IllegalStateException("Illegal correlation result : " + correlationResult);

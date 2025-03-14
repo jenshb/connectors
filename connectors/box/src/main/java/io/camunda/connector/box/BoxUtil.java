@@ -37,11 +37,16 @@ public class BoxUtil {
   }
 
   public static Optional<BoxItem.Info> findItem(BoxPath path, BoxAPIConnection api) {
-    return switch (path) {
-      case BoxPath.Root root -> Optional.of(BoxFolder.getRootFolder(api).getInfo());
-      case BoxPath.Id id -> Optional.of(new BoxFile(api, id.id()).getInfo());
-      case BoxPath.Segments segments -> findItemInTree(BoxFolder.getRootFolder(api), segments);
-    };
+    if (path instanceof BoxPath.Root) {
+      return Optional.of(BoxFolder.getRootFolder(api).getInfo());
+    }
+    if (path instanceof BoxPath.Id id) {
+      return Optional.of(new BoxFile(api, id.id()).getInfo());
+    }
+    if (path instanceof BoxPath.Segments segments) {
+      return findItemInTree(BoxFolder.getRootFolder(api), segments);
+    }
+    throw new RuntimeException("Unknown path type: " + path);
   }
 
   public static Optional<BoxItem.Info> findItemInTree(BoxFolder folder, BoxPath.Segments segments) {

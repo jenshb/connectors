@@ -62,21 +62,23 @@ public final class KafkaPropertiesUtil {
     if (request.message() != null) { // can be valid in case of inbound
       Properties messageProps = new Properties();
       messageProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, STRING_SERIALIZER);
-      switch (request.schemaStrategy()) {
-        case AvroInlineSchemaStrategy ignored:
-          messageProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, BYTE_ARRAY_SERIALIZER);
-          break;
-        case OutboundSchemaRegistryStrategy strategy:
-          messageProps.put("schema.registry.url", strategy.getSchemaRegistryUrl());
-          var serializer =
-              switch (strategy.getSchemaType()) {
-                case AVRO -> KafkaAvroSerializer.class;
-                case JSON -> KafkaJsonSchemaSerializer.class;
-              };
-          messageProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, serializer);
-          break;
-        default:
-          messageProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, STRING_SERIALIZER);
+      if (request.schemaStrategy() instanceof AvroInlineSchemaStrategy) {
+        messageProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, BYTE_ARRAY_SERIALIZER);
+      } else if (request.schemaStrategy() instanceof OutboundSchemaRegistryStrategy) {
+        OutboundSchemaRegistryStrategy strategy =
+            (OutboundSchemaRegistryStrategy) request.schemaStrategy();
+        messageProps.put("schema.registry.url", strategy.getSchemaRegistryUrl());
+        Class<?> serializer;
+        if (strategy.getSchemaType() == SchemaType.AVRO) {
+          serializer = KafkaAvroSerializer.class;
+        } else if (strategy.getSchemaType() == SchemaType.JSON) {
+          serializer = KafkaJsonSchemaSerializer.class;
+        } else {
+          throw new IllegalArgumentException("Unknown schema type: " + strategy.getSchemaType());
+        }
+        messageProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, serializer);
+      } else {
+        messageProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, STRING_SERIALIZER);
       }
       props.putAll(messageProps);
     }

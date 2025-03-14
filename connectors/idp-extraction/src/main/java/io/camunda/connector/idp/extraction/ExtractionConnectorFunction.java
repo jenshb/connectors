@@ -100,10 +100,15 @@ public class ExtractionConnectorFunction implements OutboundConnectorFunction {
   public Object execute(OutboundConnectorContext context) {
     final var extractionRequest = context.bindVariables(ExtractionRequest.class);
     final var input = extractionRequest.input();
-    return switch (extractionRequest.baseRequest()) {
-      case AwsProvider aws -> extractUsingAws(input, aws);
-      case VertexProvider gemini -> extractUsingGcp(input, gemini);
-    };
+    if (extractionRequest.baseRequest() instanceof AwsProvider aws) {
+      return extractUsingAws(input, aws);
+    } else if (extractionRequest.baseRequest() instanceof VertexProvider gemini) {
+      return extractUsingGcp(input, gemini);
+    } else {
+      throw new ConnectorException(
+          String.valueOf(HttpStatus.SC_BAD_REQUEST),
+          "Unsupported provider type: " + extractionRequest.baseRequest().getClass().getName());
+    }
   }
 
   private ExtractionResult extractUsingGcp(

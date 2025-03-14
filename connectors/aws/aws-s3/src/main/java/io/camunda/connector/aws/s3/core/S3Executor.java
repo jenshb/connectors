@@ -53,11 +53,15 @@ public class S3Executor {
   }
 
   public Object execute(S3Action s3Action) {
-    return switch (s3Action) {
-      case DeleteObject deleteObject -> delete(deleteObject);
-      case DownloadObject downloadObject -> download(downloadObject);
-      case UploadObject uploadObject -> upload(uploadObject);
-    };
+    if (s3Action instanceof UploadObject uploadObject) {
+      return upload(uploadObject);
+    } else if (s3Action instanceof DownloadObject downloadObject) {
+      return download(downloadObject);
+    } else if (s3Action instanceof DeleteObject deleteObject) {
+      return delete(deleteObject);
+    } else {
+      throw new IllegalArgumentException("Unsupported S3 action: " + s3Action);
+    }
   }
 
   private Object upload(UploadObject uploadObject) {

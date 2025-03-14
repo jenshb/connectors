@@ -59,11 +59,13 @@ public class BedrockContentMapper {
   }
 
   private ContentBlock mapToContentBlock(Object content) {
-    return switch (content) {
-      case String s -> ContentBlock.fromText(s);
-      case ImageBlock imageBlock -> ContentBlock.fromImage(imageBlock);
-      default -> ContentBlock.fromDocument((DocumentBlock) content);
-    };
+    if (content instanceof String s) {
+      return ContentBlock.fromText(s);
+    }
+    if (content instanceof DocumentBlock documentBlock) {
+      return ContentBlock.fromDocument(documentBlock);
+    }
+    return ContentBlock.fromImage((ImageBlock) content);
   }
 
   public DocumentMapper getDocumentMapper() {

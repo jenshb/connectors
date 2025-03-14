@@ -19,6 +19,8 @@
     <version.maven-plugin-annotations>3.15.1</version.maven-plugin-annotations>
     <version.maven-plugin-plugin>3.15.1</version.maven-plugin-plugin>
     <version.maven-project>2.2.1</version.maven-project>
+    <maven.compiler.source>${version.java.template-generator}</maven.compiler.source>
+    <maven.compiler.target>${version.java.template-generator}</maven.compiler.target>
   </properties>
 
   <dependencies>
@@ -57,6 +59,15 @@
             <phase>process-classes</phase>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>${version.java.template-generator}</source>
+          <target>${version.java.template-generator}</target>
+          <release>${version.java.template-generator}</release>
+        </configuration>
       </plugin>
     </plugins>
   </build>

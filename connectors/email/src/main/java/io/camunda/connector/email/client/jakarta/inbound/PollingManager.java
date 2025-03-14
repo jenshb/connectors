@@ -88,9 +88,10 @@ public class PollingManager {
 
   public void poll() {
     this.prepareForPolling();
-    switch (this.emailListenerConfig.pollingConfig()) {
-      case PollAll pollAll -> pollAllAndProcess(pollAll);
-      case PollUnseen pollUnseen -> pollUnseenAndProcess(pollUnseen);
+    if (this.emailListenerConfig.pollingConfig() instanceof PollAll pollAll) {
+      pollAllAndProcess(pollAll);
+    } else if (this.emailListenerConfig.pollingConfig() instanceof PollUnseen pollUnseen) {
+      pollUnseenAndProcess(pollUnseen);
     }
   }
 

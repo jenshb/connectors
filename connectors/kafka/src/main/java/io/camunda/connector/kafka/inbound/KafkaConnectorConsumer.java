@@ -181,19 +181,15 @@ public class KafkaConnectorConsumer {
   }
 
   private void handleCorrelationResult(CorrelationResult result) {
-    switch (result) {
-      case Success ignored -> LOG.debug("Message correlated successfully");
-      case Failure failure -> {
-        switch (failure.handlingStrategy()) {
-          case ForwardErrorToUpstream ignored -> {
-            LOG.debug("Message not correlated, reason: {}. Offset will not be committed", failure);
-            throw new RuntimeException(
-                "Message cannot be processed: " + failure.getClass().getSimpleName());
-          }
-          case Ignore ignored ->
-              LOG.debug(
-                  "Message not correlated, but the error is ignored. Offset will be committed");
-        }
+    if (result instanceof Success) {
+      LOG.debug("Message correlated successfully");
+    } else if (result instanceof Failure failure) {
+      if (failure.handlingStrategy() instanceof ForwardErrorToUpstream) {
+        LOG.debug("Message not correlated, reason: {}. Offset will not be committed", failure);
+        throw new RuntimeException(
+            "Message cannot be processed: " + failure.getClass().getSimpleName());
+      } else if (failure.handlingStrategy() instanceof Ignore) {
+        LOG.debug("Message not correlated, but the error is ignored. Offset will be committed");
       }
     }
   }

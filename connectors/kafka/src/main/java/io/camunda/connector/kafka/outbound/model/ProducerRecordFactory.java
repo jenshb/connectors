@@ -47,11 +47,14 @@ public class ProducerRecordFactory {
   private Object createMessage(final KafkaConnectorRequest request) throws Exception {
     var value = request.message().value();
     var strategy = request.schemaStrategy();
-    return switch (strategy) {
-      case AvroInlineSchemaStrategy s -> produceAvroMessage(s, value);
-      case OutboundSchemaRegistryStrategy s -> produceSchemaRegistryMessage(s, value);
-      default -> transformData(request.message().value());
-    };
+
+    if (strategy instanceof AvroInlineSchemaStrategy) {
+      return produceAvroMessage((AvroInlineSchemaStrategy) strategy, value);
+    } else if (strategy instanceof OutboundSchemaRegistryStrategy) {
+      return produceSchemaRegistryMessage((OutboundSchemaRegistryStrategy) strategy, value);
+    } else {
+      return transformData(request.message().value());
+    }
   }
 
   private String transformData(Object data) throws JsonProcessingException {

@@ -53,22 +53,30 @@ public class JakartaEmailActionExecutor implements EmailActionExecutor {
     Protocol protocol = emailRequest.data();
     Action action = protocol.getProtocolAction();
     Session session = jakartaUtils.createSession(protocol.getConfiguration());
-    return switch (action) {
-      case SmtpSendEmail smtpSendEmail -> smtpSendEmail(smtpSendEmail, authentication, session);
-      case ImapMoveEmail imapMoveEmail -> imapMoveEmails(imapMoveEmail, authentication, session);
-      case ImapListEmails imapListEmails -> imapListEmails(imapListEmails, authentication, session);
-      case ImapDeleteEmail imapDeleteEmail ->
-          imapDeleteEmail(imapDeleteEmail, authentication, session);
-      case ImapSearchEmails imapSearchEmails ->
-          imapSearchEmails(imapSearchEmails, authentication, session);
-      case ImapReadEmail imapReadEmail -> imapReadEmail(imapReadEmail, authentication, session);
-      case Pop3DeleteEmail pop3DeleteEmail ->
-          pop3DeleteEmail(pop3DeleteEmail, authentication, session);
-      case Pop3ListEmails pop3ListEmails -> pop3ListEmails(pop3ListEmails, authentication, session);
-      case Pop3ReadEmail pop3ReadEmail -> pop3ReadEmail(pop3ReadEmail, authentication, session);
-      case Pop3SearchEmails pop3SearchEmails ->
-          pop3SearchEmails(pop3SearchEmails, authentication, session);
-    };
+
+    if (action instanceof SmtpSendEmail) {
+      return smtpSendEmail((SmtpSendEmail) action, authentication, session);
+    } else if (action instanceof ImapMoveEmail) {
+      return imapMoveEmails((ImapMoveEmail) action, authentication, session);
+    } else if (action instanceof ImapListEmails) {
+      return imapListEmails((ImapListEmails) action, authentication, session);
+    } else if (action instanceof ImapDeleteEmail) {
+      return imapDeleteEmail((ImapDeleteEmail) action, authentication, session);
+    } else if (action instanceof ImapSearchEmails) {
+      return imapSearchEmails((ImapSearchEmails) action, authentication, session);
+    } else if (action instanceof ImapReadEmail) {
+      return imapReadEmail((ImapReadEmail) action, authentication, session);
+    } else if (action instanceof Pop3DeleteEmail) {
+      return pop3DeleteEmail((Pop3DeleteEmail) action, authentication, session);
+    } else if (action instanceof Pop3ListEmails) {
+      return pop3ListEmails((Pop3ListEmails) action, authentication, session);
+    } else if (action instanceof Pop3ReadEmail) {
+      return pop3ReadEmail((Pop3ReadEmail) action, authentication, session);
+    } else if (action instanceof Pop3SearchEmails) {
+      return pop3SearchEmails((Pop3SearchEmails) action, authentication, session);
+    } else {
+      throw new IllegalArgumentException("Unknown action: " + action);
+    }
   }
 
   private List<SearchEmailsResponse> imapSearchEmails(
@@ -370,15 +378,15 @@ public class JakartaEmailActionExecutor implements EmailActionExecutor {
     if (Objects.isNull(object)) {
       return Optional.empty();
     }
-    return Optional.of(
-        switch (object) {
-          case List<?> list ->
-              InternetAddress.parse(String.join(",", list.stream().map(Object::toString).toList()));
-          case String string -> InternetAddress.parse(string);
-          default ->
-              throw new IllegalStateException(
-                  "Unexpected value: " + object + ". List or String was expected");
-        });
+    if (object instanceof List<?> list) {
+      return Optional.of(
+          InternetAddress.parse(String.join(",", list.stream().map(Object::toString).toList())));
+    }
+    if (object instanceof String string) {
+      return Optional.of(InternetAddress.parse(string));
+    }
+    throw new IllegalStateException(
+        "Unexpected value: " + object + ". List or String was expected");
   }
 
   private Consumer<Document> getDocumentConsumer(Multipart multipart) {

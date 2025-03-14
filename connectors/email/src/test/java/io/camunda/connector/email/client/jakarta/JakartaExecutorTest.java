@@ -63,25 +63,22 @@ class JakartaExecutorTest {
 
   private boolean bodyContains(Object element, String toBeFound)
       throws MessagingException, IOException {
-    return switch (element) {
-      case String str -> str.contains(toBeFound);
-      case MimeMultipart multipart -> {
-        try {
-          int max = multipart.getCount();
-          boolean found = false;
-          for (int i = 0; i < max; i++) {
-            found =
-                found
-                    || bodyContains(multipart.getBodyPart(i).getContent(), toBeFound)
-                    || toBeFound.equals(multipart.getBodyPart(i).getFileName());
-          }
-          yield found;
-        } catch (MessagingException | IOException e) {
-          throw new RuntimeException(e);
-        }
+    if (element instanceof String) {
+      return ((String) element).contains(toBeFound);
+    }
+    if (element instanceof MimeMultipart) {
+      MimeMultipart multipart = (MimeMultipart) element;
+      int max = multipart.getCount();
+      boolean found = false;
+      for (int i = 0; i < max; i++) {
+        found =
+            found
+                || bodyContains(multipart.getBodyPart(i).getContent(), toBeFound)
+                || toBeFound.equals(multipart.getBodyPart(i).getFileName());
       }
-      default -> false;
-    };
+      return found;
+    }
+    return false;
   }
 
   @Test
