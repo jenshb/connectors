@@ -161,18 +161,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      - name: Deploy artifacts to Artifactory and Maven Central (Staging)
-        if: "! contains(github.event.release.tag_name, 'rc')"
-        run: mvn deploy -DskipTests -PcheckFormat -Psonatype-oss-release
-        env:
-          NEXUS_USR: ${{ steps.secrets.outputs.ARTIFACTORY_USR }}
-          NEXUS_PSW: ${{ steps.secrets.outputs.ARTIFACTORY_PSW }}
-          MAVEN_USR: ${{ steps.secrets.outputs.MAVEN_CENTRAL_DEPLOYMENT_USR }}
-          MAVEN_PSW: ${{ steps.secrets.outputs.MAVEN_CENTRAL_DEPLOYMENT_PSW }}
-          MAVEN_GPG_PASSPHRASE: ${{ steps.secrets.outputs.MAVEN_CENTRAL_GPG_SIGNING_KEY_PASSPHRASE }}
-
       - name: Deploy artifacts to Artifactory
-        if: "contains(github.event.release.tag_name, 'rc')"
         run: mvn deploy -DskipTests -PcheckFormat -Psonatype-oss-release -Dskip.central.release=true
         env:
           NEXUS_USR: ${{ steps.secrets.outputs.ARTIFACTORY_USR }}
@@ -220,24 +209,6 @@ jobs:
 
       # Build & push bundle docker images (with version tag)
 
-      - name: Build and Push Docker Image tag ${{ github.event.release.tag_name }} - connector-runtime
-        uses: docker/build-push-action@v6
-        with:
-          context: connector-runtime/connector-runtime-application/
-          push: true
-          tags: camunda/connectors:${{ github.event.release.tag_name }}
-          platforms: linux/amd64,linux/arm64
-          provenance: false
-
-      - name: Build and Push Docker Image tag ${{ github.event.release.tag_name }} - bundle-default
-        uses: docker/build-push-action@v6
-        with:
-          context: bundle/default-bundle/
-          push: true
-          tags: camunda/connectors-bundle:${{ github.event.release.tag_name }}
-          platforms: linux/amd64,linux/arm64
-          provenance: false
-
       - name: Build and Push Docker Image tag ${{ github.event.release.tag_name }} - bundle-saas
         uses: docker/build-push-action@v6
         with:
@@ -246,63 +217,6 @@ jobs:
           tags: camunda/connectors-bundle-saas:${{ github.event.release.tag_name }}
           platforms: linux/amd64,linux/arm64
           provenance: false
-
-      # Build & push bundle docker images (with 'latest' tag)
-
-      - name: Build and Push Docker Image tag latest - connector-runtime
-        uses: docker/build-push-action@v6
-        with:
-          context: connector-runtime/connector-runtime-application/
-          push: true
-          tags: camunda/connectors:latest
-          platforms: linux/amd64,linux/arm64
-          provenance: false
-
-      - name: Build and Push Docker Image tag latest - bundle-default
-        if: ${{ needs.setup.outputs.tagType == 'NORMAL' }}
-        uses: docker/build-push-action@v6
-        with:
-          context: bundle/default-bundle/
-          push: true
-          tags: camunda/connectors-bundle:latest
-          platforms: linux/amd64,linux/arm64
-          provenance: false
-
-      - name: Build and Push Docker Image tag latest - bundle-saas
-        if: ${{ needs.setup.outputs.tagType == 'NORMAL' }}
-        uses: docker/build-push-action@v6
-        with:
-          context: bundle/camunda-saas-bundle/
-          push: true
-          tags: camunda/connectors-bundle-saas:latest
-          platforms: linux/amd64,linux/arm64
-          provenance: false
-
-      # Update README in Dockerhub
-
-      - name: Push README to Dockerhub - bundle-default
-        if: ${{ needs.setup.outputs.tagType == 'NORMAL' }}
-        uses: christian-korneck/update-container-description-action@v1
-        env:
-          DOCKER_USER: ${{ steps.secrets.outputs.DOCKERHUB_USER }}
-          DOCKER_PASS: ${{ steps.secrets.outputs.DOCKERHUB_PASSWORD }}
-        with:
-          destination_container_repo: camunda/connectors-bundle
-          provider: dockerhub
-          readme_file: bundle/README.md
-          short_description: 'Camunda out-of-the-box Connectors Bundle'
-
-      - name: Push README to Dockerhub - bundle-saas
-        if: ${{ needs.setup.outputs.tagType == 'NORMAL' }}
-        uses: christian-korneck/update-container-description-action@v1
-        env:
-          DOCKER_USER: ${{ steps.secrets.outputs.DOCKERHUB_USER }}
-          DOCKER_PASS: ${{ steps.secrets.outputs.DOCKERHUB_PASSWORD }}
-        with:
-          destination_container_repo: camunda/connectors-bundle-saas
-          provider: dockerhub
-          readme_file: bundle/README.md
-          short_description: 'Camunda out-of-the-box Connectors Bundle for SaaS'
 
   bundle-and-build-changelog:
     needs: setup
