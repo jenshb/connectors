@@ -153,7 +153,10 @@ public class PollingManager {
     this.correlateEmail(message, connectorContext);
     message.setPeek(false);
     switch (pollingConfig.handlingStrategy()) {
-      case READ -> this.jakartaUtils.markAsSeen(message);
+      case READ -> {
+        this.jakartaUtils.markAsSeen(message);
+        log.info("Marking email as seen");
+      }
       case DELETE -> this.jakartaUtils.markAsDeleted(message);
       case MOVE -> {
         this.jakartaUtils.markAsSeen(message);
@@ -165,7 +168,10 @@ public class PollingManager {
   private void correlateEmail(Message message, InboundConnectorContext connectorContext) {
     Email email = this.jakartaUtils.createEmail(message);
     List<Document> documents = this.createDocumentList(email, connectorContext);
-    connectorContext.correlate(
+
+    log.info("Correlating email {}", email.messageId());
+
+    var result = connectorContext.correlate(
         CorrelationRequest.builder()
             .variables(
                 new ReadEmailResponse(
@@ -180,6 +186,8 @@ public class PollingManager {
                     email.receivedAt()))
             .messageId(email.messageId())
             .build());
+
+    log.info("Correlation result {}", result);
   }
 
   private List<Document> createDocumentList(Email email, InboundConnectorContext connectorContext) {
