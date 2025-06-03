@@ -11,5 +11,7 @@ import io.camunda.zeebe.model.bpmn.instance.FlowNode;
 import java.util.List;
 
 public interface GatewayToolDefinitionResolver {
+  String GATEWAY_TYPE_EXTENSION = "io.camunda.agenticai.gateway.type";
+
   List<GatewayToolDefinition> resolveGatewayToolDefinitions(List<FlowNode> elements);
 }

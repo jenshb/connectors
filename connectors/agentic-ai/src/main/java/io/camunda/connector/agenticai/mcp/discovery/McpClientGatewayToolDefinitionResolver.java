@@ -14,55 +14,65 @@ import io.camunda.connector.agenticai.adhoctoolsschema.resolver.GatewayToolDefin
 import io.camunda.connector.agenticai.model.tool.GatewayToolDefinition;
 import io.camunda.zeebe.model.bpmn.instance.FlowNode;
 import io.camunda.zeebe.model.bpmn.instance.ServiceTask;
+import io.camunda.zeebe.model.bpmn.instance.zeebe.ZeebeProperties;
+import io.camunda.zeebe.model.bpmn.instance.zeebe.ZeebeProperty;
 import io.camunda.zeebe.model.bpmn.instance.zeebe.ZeebeTaskDefinition;
 import java.util.List;
-import java.util.Objects;
+import java.util.function.Predicate;
 
 public class McpClientGatewayToolDefinitionResolver implements GatewayToolDefinitionResolver {
 
-  private final List<String> taskDefinitionTypePrefixes;
+  private static final Predicate<ZeebeProperty> HAS_MCP_CLIENT_PROPERTY =
+      property ->
+          GATEWAY_TYPE_EXTENSION.equals(property.getName())
+              && property.getValue().equals(McpClientGatewayToolHandler.GATEWAY_TYPE);
+
+  private final List<String> mcpClientTaskDefinitionTypePrefixes;
 
   public McpClientGatewayToolDefinitionResolver() {
     this(List.of(MCP_CLIENT_BASE_TYPE, MCP_CLIENT_REMOTE_BASE_TYPE));
   }
 
-  public McpClientGatewayToolDefinitionResolver(List<String> taskDefinitionTypePrefixes) {
-    this.taskDefinitionTypePrefixes = taskDefinitionTypePrefixes;
+  public McpClientGatewayToolDefinitionResolver(List<String> mcpClientTaskDefinitionTypePrefixes) {
+    this.mcpClientTaskDefinitionTypePrefixes = mcpClientTaskDefinitionTypePrefixes;
   }
 
   @Override
   public List<GatewayToolDefinition> resolveGatewayToolDefinitions(List<FlowNode> elements) {
     return elements.stream()
-        .map(this::extractServiceTask)
-        .filter(Objects::nonNull)
         .filter(this::isMcpClient)
         .map(
-            serviceTaskElement ->
+            element ->
                 GatewayToolDefinition.builder()
                     .type(McpClientGatewayToolHandler.GATEWAY_TYPE)
-                    .name(serviceTaskElement.element().getId())
-                    .description(getElementDocumentation(serviceTaskElement.element()).orElse(null))
+                    .name(element.getId())
+                    .description(getElementDocumentation(element).orElse(null))
                     .build())
         .toList();
   }
 
-  private boolean isMcpClient(ServiceTaskElement serviceTaskElement) {
-    String type = serviceTaskElement.taskDefinition.getType();
-    return this.taskDefinitionTypePrefixes.stream().anyMatch(type::startsWith);
+  private boolean isMcpClient(FlowNode element) {
+    return hasMcpClientExtensionProperty(element) || hasMcpClientServiceTaskType(element);
   }
 
-  private ServiceTaskElement extractServiceTask(FlowNode element) {
+  private boolean hasMcpClientExtensionProperty(FlowNode element) {
+    final var extensionProperties = element.getSingleExtensionElement(ZeebeProperties.class);
+
+    return extensionProperties != null
+        && extensionProperties.getProperties().stream().anyMatch(HAS_MCP_CLIENT_PROPERTY);
+  }
+
+  private boolean hasMcpClientServiceTaskType(FlowNode element) {
     if (!(element instanceof ServiceTask)) {
-      return null;
+      return false;
     }
 
     final var taskDefinition = element.getSingleExtensionElement(ZeebeTaskDefinition.class);
-    if (taskDefinition != null) {
-      return new ServiceTaskElement(element, taskDefinition);
+    if (taskDefinition == null) {
+      return false;
     }
 
-    return null;
+    String taskType = taskDefinition.getType();
+    return this.mcpClientTaskDefinitionTypePrefixes.stream().anyMatch(taskType::startsWith);
   }
-
-  private record ServiceTaskElement(FlowNode element, ZeebeTaskDefinition taskDefinition) {}
 }
